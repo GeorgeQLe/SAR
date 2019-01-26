@@ -124,15 +124,10 @@ class Environment:
 
     def search_adjacent_tiles(self, x, y):
         return_adjacent_tiles = AdjacentTiles()
-        if x == 0:
-            return_adjacent_tiles.add_tiles(self.__grid[x - 1][y - 1].tiletype(),
-                                            self.__grid[x][y - 1].tiletype(),
-                                            self.__grid[x + 1][y - 1].tiletype(),
-                                            self.__grid[x + 1][y].tiletype(),
-                                            self.__grid[x + 1][y + 1].tiletype(),
-                                            self.__grid[x][y + 1].tiletype(),
-                                            self.__grid[x - 1][y + 1].tiletype(),
-                                            self.__grid[x - 1][y].tiletype())
+        if x == 0 and y > 0:
+            return_adjacent_tiles.add_tiles(N=self.__grid[x][y-1] )
+        elif x == 0 and y < 0:
+            
         else:
             return_adjacent_tiles.add_tiles(self.__grid[x - 1][y - 1].tiletype(), 
                                             self.__grid[x][y - 1].tiletype(), 

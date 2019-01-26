@@ -6,6 +6,7 @@ from searchagents import SearchAgents, SearchAgentsType
 class Simulation:
 
     def __init__(self):
+        print("Simulation created")
         self.__environment          = Environment()
         self.__frequency_falsepos   = 0
         self.__target_locations     = {}
