@@ -1,6 +1,6 @@
 # Copyright 2019 George Le
 
-import np.random.rand
+import np
 
 class NeuralNetwork:
     # To construct a neural network, the user will need to pass in the array of 
