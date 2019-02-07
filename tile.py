@@ -4,7 +4,6 @@ import areatype
 import enum
 
 class TileType(enum.Enum):
-
     void        = 0
     forest      = 1
     mountain    = 2

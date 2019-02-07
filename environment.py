@@ -8,6 +8,9 @@ import random
 
 class AdjacentTiles:
     def __init__(self):
+        # there are a total of 8 tiles adjacent to the caller tile
+        # initially, these adjacent tiles are set to void which if
+        # used should be disregarded
         self.NW = TileType.void
         self.N  = TileType.void
         self.NE = TileType.void
@@ -17,6 +20,7 @@ class AdjacentTiles:
         self.SW = TileType.void
         self.W  = TileType.void
 
+    
     def add_tiles(self, NW = TileType.void, N = TileType.void, NE = TileType.void, E = TileType.void,
                  SE = TileType.void, S = TileType.void, SW = TileType.void, W = TileType.void):
         self.NW = NW
@@ -45,7 +49,9 @@ class AdjacentTiles:
     def __check_tile(self):
         disregard       = DisregardTile()
         disregarded_num = 0
-
+        
+        # the following determines if the adjacent tiles should be disregarded (if
+        # they are )
         if disregard.check_tile(self.NW):
             disregarded_num += 1
         if disregard.check_tile(self.N):
@@ -126,14 +132,10 @@ class Environment:
         for i in range(self.__x):
             for j in range(self.__y):
                 print(i, ",", j)
-                self.__grid[i] = { j : self.__generate_null_tile(i, j) }
-        for i in range(self.__x):
-            for j in range(self.__y):
                 self.__grid[i][j] = self.__generate_tile(i, j, frequency_falsepos)
 
     def search_adjacent_tiles(self, x, y):
         return_adjacent_tiles = AdjacentTiles()
-        print(x, ",", y)
         if x >= self.__x or y >= self.__y:
             return return_adjacent_tiles
 
