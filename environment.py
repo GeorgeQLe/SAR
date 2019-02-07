@@ -103,9 +103,11 @@ class Environment:
         temp = Tile(x, y)
         temp.set_target(False)
         temp.set_tile_type(TileType.void)
+        return temp
 
     def __generate_tile(self, x, y, frequency_falsepos):
         temp = Tile(x, y)
+        print(x, ",", y)
         if x == 0 and y == 0:
             temp.set_target(False)
             temp.set_tile_type(TileType.home)
@@ -133,7 +135,7 @@ class Environment:
 
     def search_adjacent_tiles(self, x, y):
         return_adjacent_tiles = AdjacentTiles()
-        print(x, ",", y)
+        
         if x >= self.__x or y >= self.__y:
             return return_adjacent_tiles
 
