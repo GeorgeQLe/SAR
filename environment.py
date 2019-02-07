@@ -20,7 +20,7 @@ class AdjacentTiles:
         self.SW = TileType.void
         self.W  = TileType.void
 
-    
+    # this function allows for the environment class to load the AdjacentTiles class with 
     def add_tiles(self, NW = TileType.void, N = TileType.void, NE = TileType.void, E = TileType.void,
                  SE = TileType.void, S = TileType.void, SW = TileType.void, W = TileType.void):
         self.NW = NW
