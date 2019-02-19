@@ -60,9 +60,9 @@ class AreaTileProbabilities:
                 TileType.forest     : 5,
                 TileType.mountain   : 7,
                 TileType.plain      : 8,
-                TileType.swamp      : 9,
-                TileType.river      : 10,
-                TileType.pond       : 11
+                TileType.pond       : 9,
+                TileType.swamp      : 10,
+                TileType.river      : 11
             }
         }
 
@@ -77,6 +77,8 @@ class AreaTileProbabilities:
 def generate_random_tile(areatype):
     tile_probabilities = AreaTileProbabilities()
     # get a random number between 1 and 10
-    roll = random.randint(1, 11)
+    roll = random.randint(0, 10)
+    print("Random roll: ", roll)
+    print("generate random tile: ", tile_probabilities.get_tile_type(roll, areatype))
     # returns the tile that corresponds to the areatype of the environment
     return tile_probabilities.get_tile_type(roll, areatype)

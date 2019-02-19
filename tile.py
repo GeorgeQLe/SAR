@@ -45,6 +45,9 @@ class Tile:
     def is_falsepos(self):
         return self.__falsepos
 
+    def coord(self):
+        return (self.__x, self.__y)
+
     def tiletype(self):
         return self.__tiletype
 
