@@ -66,7 +66,7 @@ class AreaTileProbabilities:
             }
         }
 
-    def get_tile_type(self, random_num, areatype):
+    def get_tile_type(self, random_num, areatype = AreaType.default):
         # accessing the individual elements of the tile probabilities' inner dict ;)
         for probability in self.__tile_probabilities[areatype].keys():
             # if the randomly generated number is less than the value of the 
@@ -74,11 +74,9 @@ class AreaTileProbabilities:
             if random_num < self.__tile_probabilities[areatype][probability]:
                 return probability
 
-def generate_random_tile(areatype):
+def generate_random_tile(areatype = AreaType.default):
     tile_probabilities = AreaTileProbabilities()
     # get a random number between 1 and 10
     roll = random.randint(0, 10)
-    print("Random roll: ", roll)
-    print("Generate random tile: ", tile_probabilities.get_tile_type(roll, areatype))
     # returns the tile that corresponds to the areatype of the environment
     return tile_probabilities.get_tile_type(roll, areatype)

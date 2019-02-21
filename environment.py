@@ -93,7 +93,7 @@ class AdjacentTiles:
         self.W  = W
 
     # this is the main workhorse of the AdjacentTiles class
-    def generate_tiletype_from_adj(self, areatype):
+    def generate_tiletype_from_adj(self, areatype = AreaType.default):
         temp = self.__count_tile_probabilities(areatype)
         random_roll = random.randint(1, 111)
         print("Random roll:", random_roll)
@@ -172,24 +172,30 @@ class Environment:
         return temp
 
     def draw(self):
+        for i in range(self.__x * 2 + 1):
+            print("-", end="")
+        print()
         for y in range(self.__y):
+            print("|", end="")
             for x in range(self.__x):
                 if self.__grid[x, y].tiletype() == TileType.home:
-                    print("H", end=" ")
+                    print("H", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.forest:
-                    print("Y", end=" ")
+                    print("Y", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.mountain:
-                    print("^", end=" ")
+                    print("^", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.plains:
-                    print("_", end=" ")
+                    print("_", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.pond:
-                    print("=", end=" ")
+                    print("=", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.river:
-                    print("~", end=" ")
+                    print("~", end="|")
                 elif self.__grid[x, y].tiletype() == TileType.swamp:
-                    print(".", end=" ")
+                    print(".", end="|")
             print("")
-
+        for i in range(self.__x * 2 + 1):
+            print("-", end="")
+        print()
 
     def empty(self):
         """-----------------------------------------------------------------------------------------------------
@@ -203,14 +209,11 @@ class Environment:
     def generate(self, frequency_falsepos):
         for x in range(self.__x):
             for y in range(self.__y):
-                print(x, ",", y, "Initial Add Null Tile")
                 self.__grid[x, y] = self.__generate_null_tile(x, y)
 
         for y in range(self.__x):
             for x in range(self.__y):
-                print(x, ",", y)
                 self.__grid[x, y] = self.__generate_tile(x, y, frequency_falsepos)
-                print("Grid at:", x, ",", y, "Tiletype:", self.__grid[x, y].tiletype())
 
     def search_adjacent_tiles(self, x, y):
         return_adjacent_tiles = AdjacentTiles()
@@ -219,7 +222,6 @@ class Environment:
 
         # for tiles in the center of the environment grid
         if x > 0 and x < self.__x - 1 and y > 0 and y < self.__y - 1:
-            print("center of grid")
             return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
                                             N=self.__grid[x, y + 1].tiletype(), 
                                             NE=self.__grid[x + 1, y + 1].tiletype(),
@@ -229,48 +231,40 @@ class Environment:
                                             SW=self.__grid[x - 1, y + 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x == 0 and y == 0: # for tiles in the origin and the bottom left corner
-            print("origin or bottom left corner")
             return_adjacent_tiles.add_tiles(N=self.__grid[x, y + 1].tiletype(), 
                                             NE=self.__grid[x + 1, y + 1].tiletype(),
                                             E=self.__grid[x + 1, y].tiletype())
         elif x == 0 and y == self.__y - 1: # for tile in top left corner
-            print("top left corner")
             return_adjacent_tiles.add_tiles(E=self.__grid[x + 1, y].tiletype(),
                                             SE=self.__grid[x + 1, y - 1].tiletype(),
                                             S=self.__grid[x, y - 1].tiletype())
         elif x == self.__x - 1 and y == self.__y - 1: # for tile in top right corner
-            print("top right corner")
             return_adjacent_tiles.add_tiles(S=self.__grid[x, y - 1].tiletype(),
                                             SW=self.__grid[x - 1, y - 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x == self.__x - 1 and y == 0: # for tile in bottom right corner
-            print("bottom right corner")
             return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
                                             N=self.__grid[x, y + 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x == 0 and y > 0: # for tiles in left side
-            print("left side")
             return_adjacent_tiles.add_tiles(N=self.__grid[x, y + 1].tiletype(), 
                                             NE=self.__grid[x + 1, y + 1].tiletype(),
                                             E=self.__grid[x + 1, y].tiletype(),
                                             SE=self.__grid[x + 1, y - 1].tiletype(),
                                             S=self.__grid[x, y - 1].tiletype())
         elif x == self.__x - 1 and y > 0: # for tiles in right side
-            print("right side")
             return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
                                             N=self.__grid[x, y + 1].tiletype(), 
                                             S=self.__grid[x, y - 1].tiletype(),
                                             SW=self.__grid[x - 1, y + 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x > 0 and y == 0: # for tiles in bottom row
-            print("bottom row")
             return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
                                             N=self.__grid[x, y + 1].tiletype(), 
                                             NE=self.__grid[x + 1, y + 1].tiletype(),
                                             E=self.__grid[x + 1, y].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x > 0 and y == self.__y - 1: # for tiles in the top row
-            print("top row")
             return_adjacent_tiles.add_tiles(E=self.__grid[x + 1, y].tiletype(),
                                             SE=self.__grid[x + 1, y - 1].tiletype(),
                                             S=self.__grid[x, y - 1].tiletype(),

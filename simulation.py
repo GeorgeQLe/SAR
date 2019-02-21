@@ -30,4 +30,4 @@ class Simulation:
         print("Environment generated")
         self.__environment.draw()
         for i in range(num_of_turns):
-            pass     
+            pass
