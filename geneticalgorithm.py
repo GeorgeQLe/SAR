@@ -3,4 +3,5 @@
 class GeneticAlgorithm:
 
     def __init__(self):
-        pass
+        self.__number_of_generations    = 0
+        self.__population_size          = 0

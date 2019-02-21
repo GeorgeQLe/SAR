@@ -21,35 +21,6 @@ class AdjacentTiles:
         self.SW = TileType.void
         self.W  = TileType.void
 
-    # this function allows for the environment class to load the AdjacentTiles class with the current tile's
-    # adjacent tiles
-    def add_tiles(self, NW = TileType.void, N = TileType.void, NE = TileType.void, E = TileType.void,
-                 SE = TileType.void, S = TileType.void, SW = TileType.void, W = TileType.void):
-        self.NW = NW
-        self.N  = N
-        self.NE = NE
-        self.E  = E
-        self.SE = SE
-        self.S  = S
-        self.SW = SW
-        self.W  = W
-
-    # this is the main workhorse of the AdjacentTiles class
-    def generate_tiletype_from_adj(self, areatype):
-        temp = self.__count_tile_probabilities(areatype)
-        random_roll = random.randint(1, 111)
-        print(random_roll)
-        print(temp)
-        if random_roll >= 100:
-            print("Generate random tile")
-            return generate_random_tile(areatype)
-        for probability in temp.keys():
-            print(probability, ":", temp[probability])
-            if temp[probability] < random_roll:
-                print("Selected:", probability)
-                return probability
-        return generate_random_tile(areatype)
-
     def __add_probability(self, return_probabilities, tiletype, individual_probabilities):
         if tiletype != TileType.void and tiletype != TileType.home:
             return_probabilities[tiletype] += individual_probabilities
@@ -79,13 +50,13 @@ class AdjacentTiles:
             disregarded_num += 1
 
         if disregarded_num == len(TileType):
-            return 0
+            return 0.0
 
-        return 100.0 / (len(TileType) - disregarded_num)
+        return (len(TileType) - disregarded_num)
 
     def __count_tile_probabilities(self, areatype):
         individual_probabilities = self.__check_tile()
-        return_probabilities = { TileType : float }
+        return_probabilities = { }
 
         # checks to see if the adjacent tiles are relevant (if this is the first time,
         # )
@@ -107,6 +78,37 @@ class AdjacentTiles:
         return_probabilities = self.__add_probability(return_probabilities, self.W, individual_probabilities)
 
         return return_probabilities
+
+    # this function allows for the environment class to load the AdjacentTiles class with the current tile's
+    # adjacent tiles
+    def add_tiles(self, NW = TileType.void, N = TileType.void, NE = TileType.void, E = TileType.void,
+                 SE = TileType.void, S = TileType.void, SW = TileType.void, W = TileType.void):
+        self.NW = NW
+        self.N  = N
+        self.NE = NE
+        self.E  = E
+        self.SE = SE
+        self.S  = S
+        self.SW = SW
+        self.W  = W
+
+    # this is the main workhorse of the AdjacentTiles class
+    def generate_tiletype_from_adj(self, areatype):
+        temp = self.__count_tile_probabilities(areatype)
+        random_roll = random.randint(1, 111)
+        print("Random roll:", random_roll)
+        print("Temp:", temp)
+        if random_roll >= 100:
+            print("Generate random tile")
+            return generate_random_tile(areatype)
+        for probability in temp.keys():
+            print("Generate from existing")
+            print("Probability:", probability, ":", temp[probability])
+            random_roll = random.randint(0, 11)
+            if temp[probability] > random_roll:
+                print("Selected:", probability)
+                return probability
+        return generate_random_tile(areatype)
 
 class Environment:
 
@@ -169,6 +171,26 @@ class Environment:
 
         return temp
 
+    def draw(self):
+        for y in range(self.__y):
+            for x in range(self.__x):
+                if self.__grid[x, y].tiletype() == TileType.home:
+                    print("H", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.forest:
+                    print("Y", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.mountain:
+                    print("^", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.plains:
+                    print("_", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.pond:
+                    print("=", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.river:
+                    print("~", end=" ")
+                elif self.__grid[x, y].tiletype() == TileType.swamp:
+                    print(".", end=" ")
+            print("")
+
+
     def empty(self):
         """-----------------------------------------------------------------------------------------------------
 
@@ -219,7 +241,7 @@ class Environment:
         elif x == self.__x - 1 and y == self.__y - 1: # for tile in top right corner
             print("top right corner")
             return_adjacent_tiles.add_tiles(S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y + 1].tiletype(),
+                                            SW=self.__grid[x - 1, y - 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         elif x == self.__x - 1 and y == 0: # for tile in bottom right corner
             print("bottom right corner")
@@ -252,14 +274,12 @@ class Environment:
             return_adjacent_tiles.add_tiles(E=self.__grid[x + 1, y].tiletype(),
                                             SE=self.__grid[x + 1, y - 1].tiletype(),
                                             S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y + 1].tiletype(),
+                                            SW=self.__grid[x - 1, y - 1].tiletype(),
                                             W=self.__grid[x - 1, y].tiletype())
         return return_adjacent_tiles
 
-    def set_environment(self, x = 1, y = 1, num_targets = 1):
+    def set_environment(self, x = 1, y = 1, areatype = AreaType.default, num_targets = 1):
+        self.__areatype     = areatype
+        self.__num_targets  = num_targets
         self.__x            = x
         self.__y            = y
-        self.__num_targets  = num_targets
-
-    def set_environment_details(self, areatype = AreaType.default):
-        self.__areatype = areatype

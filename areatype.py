@@ -19,7 +19,7 @@ class AreaTileProbabilities:
             AreaType.default : {
                 TileType.forest     : 1,
                 TileType.mountain   : 3,
-                TileType.plain      : 5,
+                TileType.plains     : 5,
                 TileType.pond       : 7,
                 TileType.river      : 9,
                 TileType.swamp      : 11
@@ -27,7 +27,7 @@ class AreaTileProbabilities:
             AreaType.islands : {
                 TileType.forest     : 3,
                 TileType.mountain   : 5,
-                TileType.plain      : 7,
+                TileType.plains     : 7,
                 TileType.pond       : 7,
                 TileType.river      : 11,
                 TileType.swamp      : 11
@@ -35,7 +35,7 @@ class AreaTileProbabilities:
             AreaType.mountain_range : {
                 TileType.forest     : 2,
                 TileType.mountain   : 6,
-                TileType.plain      : 7,
+                TileType.plains     : 7,
                 TileType.pond       : 8,
                 TileType.river      : 10,
                 TileType.swamp      : 11
@@ -43,7 +43,7 @@ class AreaTileProbabilities:
             AreaType.rural_fields : {
                 TileType.forest     : 1,
                 TileType.mountain   : 1,
-                TileType.plain      : 9,
+                TileType.plains     : 9,
                 TileType.pond       : 10,
                 TileType.river      : 11,
                 TileType.swamp      : 11
@@ -51,7 +51,7 @@ class AreaTileProbabilities:
             AreaType.swampland : {
                 TileType.forest     : 3,
                 TileType.mountain   : 3,
-                TileType.plain      : 3,
+                TileType.plains     : 3,
                 TileType.pond       : 4,
                 TileType.river      : 5,
                 TileType.swamp      : 11
@@ -59,7 +59,7 @@ class AreaTileProbabilities:
             AreaType.woodlands : {
                 TileType.forest     : 5,
                 TileType.mountain   : 7,
-                TileType.plain      : 8,
+                TileType.plains     : 8,
                 TileType.pond       : 9,
                 TileType.swamp      : 10,
                 TileType.river      : 11
@@ -79,6 +79,6 @@ def generate_random_tile(areatype):
     # get a random number between 1 and 10
     roll = random.randint(0, 10)
     print("Random roll: ", roll)
-    print("generate random tile: ", tile_probabilities.get_tile_type(roll, areatype))
+    print("Generate random tile: ", tile_probabilities.get_tile_type(roll, areatype))
     # returns the tile that corresponds to the areatype of the environment
     return tile_probabilities.get_tile_type(roll, areatype)

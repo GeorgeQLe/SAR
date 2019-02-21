@@ -7,7 +7,7 @@ class TileType(enum.Enum):
     void        = 0
     forest      = 1
     mountain    = 2
-    plain       = 3
+    plains       = 3
     pond        = 4
     river       = 5
     swamp       = 6
@@ -20,11 +20,11 @@ class DisregardTile():
             TileType.void       : True,
             TileType.forest     : False,
             TileType.mountain   : False,
-            TileType.plain      : False,
+            TileType.plains     : False,
             TileType.pond       : False,
             TileType.river      : False,
             TileType.swamp      : False,
-            TileType.home       : True 
+            TileType.home       : True
         }
 
     def check_tile(self, tiletype):

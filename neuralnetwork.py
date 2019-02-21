@@ -7,4 +7,3 @@ class NeuralNetwork:
     # input values for the input layer of the neural network as well as 
     def __init__(self, x, y):
         self.input      = x
-        self.weights1   = np.random.rand(self.input.shape[1], )
