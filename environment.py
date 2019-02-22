@@ -172,30 +172,31 @@ class Environment:
         return temp
 
     def draw(self):
-        for i in range(self.__x * 2 + 1):
-            print("-", end="")
-        print()
-        for y in range(self.__y):
-            print("|", end="")
-            for x in range(self.__x):
-                if self.__grid[x, y].tiletype() == TileType.home:
-                    print("H", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.forest:
-                    print("Y", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.mountain:
-                    print("^", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.plains:
-                    print("_", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.pond:
-                    print("=", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.river:
-                    print("~", end="|")
-                elif self.__grid[x, y].tiletype() == TileType.swamp:
-                    print(".", end="|")
-            print("")
-        for i in range(self.__x * 2 + 1):
-            print("-", end="")
-        print()
+        if self.__good_grid:
+            for i in range(self.__x * 2 + 1):
+                print("-", end="")
+            print()
+            for y in range(self.__y):
+                print("|", end="")
+                for x in range(self.__x):
+                    if self.__grid[x, y].tiletype() == TileType.home:
+                        print("H", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.forest:
+                        print("Y", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.mountain:
+                        print("^", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.plains:
+                        print("_", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.pond:
+                        print("=", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.river:
+                        print("~", end="|")
+                    elif self.__grid[x, y].tiletype() == TileType.swamp:
+                        print(".", end="|")
+                print("")
+            for i in range(self.__x * 2 + 1):
+                print("-", end="")
+            print()
 
     def empty(self):
         """-----------------------------------------------------------------------------------------------------
@@ -214,6 +215,7 @@ class Environment:
         for y in range(self.__x):
             for x in range(self.__y):
                 self.__grid[x, y] = self.__generate_tile(x, y, frequency_falsepos)
+        self.__good_grid = True
 
     def search_adjacent_tiles(self, x, y):
         return_adjacent_tiles = AdjacentTiles()
