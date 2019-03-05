@@ -3,15 +3,31 @@
 import areatype
 import enum
 
-class TileType(enum.Enum):
+class TileType(enum.IntEnum):
     void        = 0
     forest      = 1
     mountain    = 2
-    plains       = 3
+    plains      = 3
     pond        = 4
     river       = 5
     swamp       = 6
     home        = 7
+
+def get_tiletypes_after(self, index_tiletype = TileType.void):
+    """
+        TODO: FIX return_tiles is somehow empty
+    """
+    return_tiles = []
+    if index_tiletype == TileType.void:
+        return return_tiles
+
+    for tiletype in TileType:
+        # add to the list if the tiletype is the tiletype 
+        # and after the tiletype in value
+        print("Index tile:", index_tiletype, " <= Tiletype: ", tiletype)
+        if int(index_tiletype) <= int(tiletype):
+            return_tiles.append(tiletype)
+    return return_tiles
 
 class DisregardTile():
 
@@ -28,6 +44,7 @@ class DisregardTile():
         }
 
     def check_tile(self, tiletype):
+        print("Disregard tile", tiletype, ":", self.__tiles[tiletype])
         return self.__tiles[tiletype]
 
 class Tile:

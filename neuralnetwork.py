@@ -1,9 +1,26 @@
 # Copyright 2019 George Le
 
+from math import exp
+
 class Neuron:
     
     def __init__(self, weight = 0.0):
+        self.__output   = 0.0
         self.__weight   = weight
+
+    def __sigmoid(self, input):
+        return (1.0 / (1.0 + exp(-input)))
+
+    def evaluate_neuron(self, inputs = [], bias = 0.0):
+        if len(inputs) == 0:
+            return
+        sum = 0.0
+        # sum = w0
+        for input in inputs:
+            sum += input
+        # sum + bias
+        sum += bias
+        return self.__sigmoid(sum)
 
 class NeuralNetworkInputs:
     """-----------------------------------------------------------------------------
@@ -13,8 +30,8 @@ class NeuralNetworkInputs:
         the input can be easily reformatted.
 
     -----------------------------------------------------------------------------"""
-    def __init__(self):
-        self.__inputs        = list()
+    def __init__(self, inputs = list()):
+        self.__inputs        = inputs
         self.__good_inputs   = False
 
     def set_inputs(self, inputs):
@@ -22,9 +39,12 @@ class NeuralNetworkInputs:
         self.__good_inputs  = True
 
     def __verify_inputs(self, inputs):
-        for input in inputs:
-            if not isinstance(input, int):
-                return []
+        if isinstance(inputs, list):
+            for input in inputs:
+                if not isinstance(input, int):
+                    return []
+        else:
+            return []
         return inputs
 
 class NeuralNetwork:
@@ -50,3 +70,5 @@ class NeuralNetwork:
     def define_size_of_layer(self, index = 0, size = 1):
         if index > 0 and index < self.__num_layers:
             self.__layers[index].append(Neuron())
+
+    

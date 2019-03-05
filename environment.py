@@ -2,7 +2,7 @@
 
 from areatype import AreaType, AreaTileProbabilities, generate_random_tile
 from collections import defaultdict
-from tile import DisregardTile, Tile, TileType
+from tile import DisregardTile, get_tiletypes_after, Tile, TileType
 
 import random
 
@@ -28,12 +28,10 @@ class AdjacentTiles:
             { tiletype : probability } 
         
         ---------------------------------------------------------------------------------"""
-        if tiletype != TileType.void and tiletype != TileType.home:
-            print("Tiletype:", tiletype)
-            print("Before return_probabilities", return_probabilities[tiletype])
-            print("Add probabilities", add_probability)
-            return_probabilities[tiletype] += add_probability
-            print("After return_probabilities", return_probabilities[tiletype])
+        if tiletype != TileType.void or tiletype != TileType.home:
+            print(get_tiletypes_after(tiletype))
+            for index_types in get_tiletypes_after(tiletype):
+                return_probabilities[index_types] += add_probability
         return return_probabilities
 
     def __check_tile(self):
@@ -70,10 +68,10 @@ class AdjacentTiles:
             disregarded_num += 1
 
         # this is for the first two tiles, to return zero
-        if disregarded_num == len(TileType):
+        if disregarded_num == 8:
             return 0.0
-        print("Disregard num:", 100 / (len(TileType) - disregarded_num))
-        return 100 / (len(TileType) - disregarded_num)
+        print("Disregard num:", 8 / (8 - disregarded_num))
+        return 8 / (8 - disregarded_num)
 
     def __count_tile_probabilities(self, areatype):
         """---------------------------------------------------------------------------------
@@ -85,29 +83,46 @@ class AdjacentTiles:
             simulation.
         
         ---------------------------------------------------------------------------------"""
-        individual_probabilities = self.__check_tile()
-        return_probabilities = { }
+        individual_probability_modifier = self.__check_tile()
+        return_probabilities = AreaTileProbabilities().get_values(areatype=areatype)
+        print("Return probabilities: ", return_probabilities)
 
         # checks to see if the adjacent tiles are relevant (if this is the first time,
         # )
-        if individual_probabilities == 0:
-            return { }
-
         # set all of the adjacent tiles' probabilities to 0.0
-        for tiletype in TileType:
-            return_probabilities[tiletype] = 0.0
-
-        # records the probabilities for each of the eight adjacent tiles
-        return_probabilities = self.__add_probability(return_probabilities, self.NW, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.N, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.NE, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.E, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.SE, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.S, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.SW, individual_probabilities)
-        return_probabilities = self.__add_probability(return_probabilities, self.W, individual_probabilities)
-
-        return return_probabilities
+        # for tiletype in TileType:
+        #     return_probabilities[tiletype] = 0.0
+        
+        if individual_probability_modifier == 0:
+            return return_probabilities
+        
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        # modifies the probabilities for each of the eight adjacent tiles
+        return_probabilities = self.__add_probability(return_probabilities, self.NW, individual_probability_modifier)
+        print("NW")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.N, individual_probability_modifier)
+        print("N")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.NE, individual_probability_modifier)
+        print("NE")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.E, individual_probability_modifier)
+        print("E")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.SE, individual_probability_modifier)
+        print("SE")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.S, individual_probability_modifier)
+        print("S")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.SW, individual_probability_modifier)
+        print("SW")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return_probabilities = self.__add_probability(return_probabilities, self.W, individual_probability_modifier)
+        print("W")
+        print("NW: ", self.NW, ", N: ", self.N, ", NE: ", self.NE, ", E: ", self.E, ", SE: ", self.SE, ", S: ", self.S, ", SW: ", self.SW, ", W: ", self.W)
+        return return_probabilities 
 
     # this function allows for the environment class to load the AdjacentTiles class with the current tile's
     # adjacent tiles
