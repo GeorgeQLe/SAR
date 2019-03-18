@@ -194,8 +194,9 @@ class Environment:
                     elif self.__grid[x, y].tiletype() == TileType.swamp:
                         print(".", end="|")
                 print("")
-            for i in range(self.__x * 2 + 1):
-                print("-", end="")
+                for i in range(self.__x * 2 + 1):
+                    print("-", end="")
+                print()
             print()
 
     def empty(self):
@@ -208,12 +209,12 @@ class Environment:
         self.__good_grid = False
 
     def generate(self, frequency_falsepos):
-        for x in range(self.__x):
-            for y in range(self.__y):
+        for y in range(self.__y):
+            for x in range(self.__x):
                 self.__grid[x, y] = self.__generate_null_tile(x, y)
 
-        for y in range(self.__x):
-            for x in range(self.__y):
+        for y in range(self.__y):
+            for x in range(self.__x):
                 self.__grid[x, y] = self.__generate_tile(x, y, frequency_falsepos)
         self.__good_grid = True
 
