@@ -1,7 +1,7 @@
 # Copyright 2019 George Le
 
 from areatype import AreaType
-from searchagents import Environment, SearchAgents, SearchAgentsType
+from searchagents import Environment, NeuralNetwork, SearchAgents, SearchAgentsType
 
 class Simulation:
 
@@ -12,20 +12,42 @@ class Simulation:
         self.__searchagents         = list()
 
     def __setup_test_environment(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1):
+        print("Setup test environment")
         self.__environment.set_environment(x, y, areatype, num_search_targets)
 
-    def __setup_search_agents(self, num_search_agents = 1):
+    def __setup_search_agents(self, num_search_agents = 1, population = list()):
+        if len(population) != num_search_agents:
+            if len(population) > num_search_agents:
+                difference_population = len(population) - num_search_agents
+                for i in range(difference_population):
+                    population.pop()
+            elif len(population) < num_search_agents:
+                difference_population = num_search_agents - len(population)
+                for i in range(difference_population):
+                    temp_nn = NeuralNetwork(num_layers= 3)
+                    temp_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
+                    temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
+                    temp_nn.create_layer(index= 2, size= 9, last_layer= True)
+                    population.append(temp_nn)
+        
+        for nn in population:
+            if not isinstance(nn, NeuralNetwork):
+                pass
+
+        print("Start creating Search Agent")
         for i in range(num_search_agents):
             temp = SearchAgents(SearchAgentsType.drone)
+            temp.set_brain(population[i])
             self.__searchagents.append(temp)
-
-    def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1):
-        self.__setup_test_environment(x, y, areatype, num_search_agents)
-        self.__setup_search_agents(num_search_agents)
 
     def run_simulation(self, num_of_turns = 30):
         self.__environment.generate(self.__frequency_falsepos)
         print("Environment generated")
         self.__environment.draw()
+
         for i in range(num_of_turns):
             pass
+
+    def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1):
+        self.__setup_test_environment(x, y, areatype, num_search_agents)
+        self.__setup_search_agents(num_search_agents)

@@ -63,6 +63,25 @@ class Environment:
 
         return temp
 
+    def check_home(self, x = 0, y = 0):
+        if self.check_tile(x, y) == True:
+            if self.__grid[x, y] == TileType.home:
+                return True
+        return False
+
+    def check_tile(self, x = 0, y = 0):
+        """---------------------------------------------------------------
+
+            This function checks to see if the tile is in the grid. If it 
+            is return True, if not return False.
+            
+        ---------------------------------------------------------------"""
+        coord = (x, y)
+        # checks to see if the coordinates are in the grid
+        if coord in self.__grid.keys():
+            return False
+        return True
+
     def draw(self):
         """------------------------------------------------------------------
 
@@ -125,7 +144,7 @@ class Environment:
         # pseudo-randomly generate tiles on the grid
         for y in range(self.__x):
             for x in range(self.__y):
-                print("Tile at: ", x, ",", y)
+                # print("Tile at: ", x, ",", y)
                 self.__grid[x, y] = self.__generate_tile(x, y, frequency_falsepos)
 
         # generates the tiles for the grid
@@ -139,11 +158,11 @@ class Environment:
 
             # checks to see if the random roll warrants the tile being a target or falsepos
             if random_roll < frequency_falsepos:
-                print("Set target - falsepos")
+                # print("Set target - falsepos")
                 self.__grid[random_x, random_y].set_target(True)
                 self.__targets[random_x, random_y] = TileTargetInfo.falsepos
             else:
-                print("Set target")
+                # print("Set target")
                 self.__grid[random_x, random_y].set_target(False)
                 self.__targets[random_x, random_y] = TileTargetInfo.target
                 # the target only counts to the number of valid generated targets if it is not a falsepos
@@ -225,6 +244,11 @@ class Environment:
             if self.__targets[coord] == TileTargetInfo.falsepos and random.randint(1, 10) <= search_skill:
                 self.__targets.pop(coord)
                 return TileTargetInfo.falsepos
+            elif self.__targets[coord] == TileTargetInfo.target:
+                self.__targets.pop(coord)
+                return TileTargetInfo.target
+        else:
+            return TileTargetInfo.empty
 
     def set_environment(self, x = 1, y = 1, areatype = AreaType.default, num_targets = 1):
         """------------------------------------------------------------------

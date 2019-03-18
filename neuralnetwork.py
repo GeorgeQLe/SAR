@@ -102,12 +102,16 @@ class NeuralNetworkWeights:
         if isinstance(weights, OrderedDict):
             for input in weights.keys():
                 if not isinstance(input, int):
+                    print("Problem with keys")
                     return OrderedDict()
                 elif not isinstance(weights[input], list):
+                    print("Problem with the neuron weights container")
                     return OrderedDict()
-                for weight in weights[input]:
-                    if not isinstance(weight, NeuronWeights):
-                        return OrderedDict()
+                if len(weights) > 0:
+                    for weight in weights[input]:
+                        if not isinstance(weight, float):
+                            print("Problem with the neuron weight")
+                            return OrderedDict()
         else:
             return OrderedDict()
         return weights
@@ -331,10 +335,11 @@ class NeuralNetwork:
         self.__neuron_ID        = 1
         self.__num_layers       = num_layers
         self.__num_neurons      = 0
+        self.__num_weights      = 0
 
     def __insert_weights(self, ID = 0, weights = NeuronWeights()):
         neuron_index = find_neuron_id_in_layer(self.__layers_size, ID)
-        self.__layers[neuron_index][ID - self.__layers_size[neuron_index - 1] - 1].set_output_weights(weights)
+        self.__layers[neuron_index][ID - self.__layers_size[neuron_index] - 1].set_output_weights(weights)
 
     def create_layer(self, index = 0, size = 1, size_of_next_layer = 0, last_layer = False):
         print("Creating layer #", index)
@@ -363,6 +368,13 @@ class NeuralNetwork:
             if last_layer == True:
                 for size in self.__layers_size:
                     self.__num_neurons += size
+                # for each layer in the neural network
+                for layer_index in self.__layers.keys():
+                    # for each neuron in the layer
+                    for neuron in self.__layers[layer_index]:
+                        self.__num_weights += neuron.get_num_of_weights()
+            print("Layers size:", self.__layers_size)
+            print("Number of weights in the neural network:", self.__num_weights)
 
     def evaluate(self, inputs = NeuralNetworkInputs()):
         if len(inputs.inputs) != len(self.__layers[0]):
@@ -394,19 +406,21 @@ class NeuralNetwork:
         neural_network_output = list()
         for neuron in self.__layers[2]:
             neural_network_output.append(self.__layers[2][neuron.ID() - self.__layers_size[2] - 1].get_output())
+        print("Number of neurons", self.__num_neurons)
         return neural_network_output
 
     def get_weights(self):
 
         # is an ordereddict that has a key-value pair
         # neuron_id (int) : list(neuron_weights (float))
-        return_weights = OrderedDict()
+        weights = OrderedDict()
         
         # for each layer in the neural network
         for layer_index in self.__layers.keys():
             # for each neuron in the layer
             for neuron in self.__layers[layer_index]:
-                return_weights[neuron.ID()] = neuron.get_output_weights()
+                weights[neuron.ID()] = neuron.get_output_weights().weights
+        return_weights = NeuralNetworkWeights(layers_size= self.__layers_size, num_of_weights= self.__num_weights, weights= weights)
         return return_weights
 
     def override_weights(self, weights = NeuralNetworkWeights()):
@@ -418,12 +432,10 @@ class NeuralNetwork:
         """
         if weights.check_weights() == False:
             return
-
         # update the neural network to the new neural network size and structure
-        self.__layers_size  = weights.layers_size
-
+        self.__layers_size  = weights.layer_size
         for neuron_id in weights.weights.keys():
-            self.__insert_weights(neuron_id, weights.weights[neuron_id])
+            self.__insert_weights(neuron_id, NeuronWeights(weights.weights[neuron_id]))
 
     def search_neuron_by_ID(self, ID):
         neuron_index    = find_neuron_id_in_layer(self.__layers_size, ID)

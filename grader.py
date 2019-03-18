@@ -4,5 +4,5 @@ class Grader:
     def __init__(self):
         self.__notifiers = []
 
-    def notified(self):
+    def grade(self):
         pass

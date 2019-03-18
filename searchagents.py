@@ -6,6 +6,8 @@ from environment import AdjacentTiles, Environment
 from neuralnetwork import NeuralNetwork, NeuralNetworkInputs
 from tile import resolve_tiletype_as_float, TileTargetInfo, TileType
 
+from collections import OrderedDict
+
 class Direction(enum.IntEnum):
     STAY    = 0
     NW      = 1
@@ -17,18 +19,22 @@ class Direction(enum.IntEnum):
     SW      = 7
     W       = 8
 
+class Move_Error(enum.IntEnum):
+    NOTENOUGHFUEL   = 0
+    MOVEOUTOFBOUND  = 1
+
 class SearchAgentsType(enum.Enum):
     human = 0
     drone = 1
 
 class SearchAgents:
-    def __init__(self, search_agent_type = SearchAgentsType.human):
+    def __init__(self, initial_position_x = 0, initial_position_y = 0, search_skill = 2, fuel_level = 0, max_fuel = 0, search_agent_type = SearchAgentsType.human):
         self.__brain            = NeuralNetwork()
-        
-        self.__fuel_level       = 0
-        self.__max_fuel         = 0
-        self.__position         = (0, 0)
-        self.__search_skill     = 2
+        self.__fuel_level       = fuel_level
+        self.__max_fuel         = max_fuel
+        self.__path_taken       = OrderedDict()
+        self.__position         = (initial_position_x, initial_position_y)
+        self.__search_skill     = search_skill
         self.__steps_taken      = 0
         self.__targets_found    = 0
         self.__turns_taken      = 0
@@ -38,13 +44,46 @@ class SearchAgents:
         return environment.search_adjacent_tiles(self.__position[0], self.__position[1])
 
     def __move(self, direction = 0, environment = Environment()):
+        # checks to see if the search agent has enough fuel to move
         if (self.__fuel_level + 1) > self.__max_fuel:
-            pass
+            return False
+        # create a temp coordinates
+        new_coord = list(self.__position)
+
+        if direction == Direction.NW:
+            new_coord[0] -= 1 # x - 1
+            new_coord[1] += 1 # y + 1
+        elif direction == Direction.N:
+            new_coord[1] += 1 # y + 1
+        elif direction == Direction.NE:
+            new_coord[0] += 1 # x + 1
+            new_coord[1] += 1 # y + 1
+        elif direction == Direction.E:
+            new_coord[0] += 1 # x + 1
+        elif direction == Direction.SE:
+            new_coord[0] += 1 # x + 1
+            new_coord[1] -= 1 # y - 1
+        elif direction == Direction.S:
+            new_coord[1] -= 1 # y - 1
+        elif direction == Direction.SW:
+            new_coord[0] -= 1 # x - 1
+            new_coord[1] -= 1 # y - 1
+        elif direction == Direction.W:
+            new_coord[0] -= 1 # x - 1
+        elif direction == Direction.STAY:
+            # stay is only for the home tile and lets the search agent refuel
+            self.__fuel_level = self.__max_fuel
+
+        if environment.check_tile(new_coord[0], new_coord[1]) == False:
+            return False
         # reduce the amount of fuel the search agent has by one
         self.__fuel_level    -= 1
         self.__steps_taken   += 1
+        self.__position      = tuple(new_coord)
 
     def __search(self, environment = Environment()):
+        self.__fuel_level   -= 1
+        self.__steps_taken  += 1
         # return the result of a search on the current tile it is on
         return environment.search_tile(self.__position[0], self.__position[1], self.__search_skill)
 
@@ -55,9 +94,9 @@ class SearchAgents:
 
         decision_list = self.__brain.evaluate(NeuralNetworkInputs(adj_list))
         decision = decision_list.index(max(decision_list))
-        if decision == 0:
+        if decision == 0 and not environment.check_home(self.__position[0], self.__position[1]):
             self.__search(environment)
-        elif decision >= 1 and decision <= 8:
+        else:
             self.__move(decision, environment)
 
     def resolve_turn(self, environment):

@@ -62,7 +62,7 @@ class AreaTileProbabilities:
                                 (TileType.swamp, 11)]
 
     def get_tile_type(self, random_num, areatype = AreaType.default):
-        print(areatype)
+        # print(areatype)
         tile_probabilities = self.get_values(areatype)
         # accessing the individual elements of the tile probabilities' 
         # inner dict ;)
