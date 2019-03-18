@@ -1,8 +1,7 @@
 # Copyright 2019 George Le
 
 from areatype import AreaType
-from environment import Environment
-from searchagents import SearchAgents, SearchAgentsType
+from searchagents import Environment, SearchAgents, SearchAgentsType
 
 class Simulation:
 
@@ -10,8 +9,7 @@ class Simulation:
         print("Simulation created")
         self.__environment          = Environment()
         self.__frequency_falsepos   = 0
-        self.__target_locations     = {}
-        self.__searchagents         = []
+        self.__searchagents         = list()
 
     def __setup_test_environment(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1):
         self.__environment.set_environment(x, y, areatype, num_search_targets)
