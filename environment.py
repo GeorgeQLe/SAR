@@ -118,8 +118,9 @@ class Environment:
                     elif self.__grid[x, y].tiletype() == TileType.swamp:
                         print(".", end="|")
                 print("")
-            for i in range(self.__x * 2 + 1):
-                print("-", end="")
+                for i in range(self.__x * 2 + 1):
+                    print("-", end="")
+                print()
             print()
 
     def empty(self):
