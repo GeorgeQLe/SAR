@@ -1,5 +1,5 @@
-from searchagents import SearchAgents
+from searchagent import SearchAgent
 
-class Drone(SearchAgents):
+class Drone(SearchAgent):
     def __init__(self):
         pass

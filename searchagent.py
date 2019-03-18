@@ -27,10 +27,11 @@ class SearchAgentsType(enum.Enum):
     human = 0
     drone = 1
 
-class SearchAgents:
-    def __init__(self, initial_position_x = 0, initial_position_y = 0, search_skill = 2, fuel_level = 0, max_fuel = 0, search_agent_type = SearchAgentsType.human):
+class SearchAgent:
+    def __init__(self, initial_position_x = 0, initial_position_y = 0, search_skill = 2, fuel_level = 0, max_fuel = 0, search_agent_type = SearchAgentsType.human, ID = 0):
         self.__brain            = NeuralNetwork()
         self.__fuel_level       = fuel_level
+        self.__ID               = ID
         self.__max_fuel         = max_fuel
         self.__path_taken       = OrderedDict()
         self.__position         = (initial_position_x, initial_position_y)
@@ -100,7 +101,7 @@ class SearchAgents:
             self.__move(decision, environment)
 
     def resolve_turn(self, environment):
-        self.__think(self.__get_adjacent_tiles(environment))
+        self.__think(environment)
         self.__turns_taken += 1
 
     def set_brain(self, new_brain = NeuralNetwork()):

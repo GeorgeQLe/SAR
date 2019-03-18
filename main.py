@@ -5,7 +5,7 @@ from sys import argv
 from areatype import AreaType
 from neuralnetwork import NeuralNetwork, NeuralNetworkInputs
 from geneticalgorithm import GeneticAlgorithm, Simulation
-from searchagents import SearchAgents
+from searchagent import SearchAgent
 
 from random import uniform
 
@@ -18,12 +18,12 @@ def main():
     #         x = int(argv[1])
     #         y = int(argv[2])
 
-    simulation = Simulation()
-    simulation.setup_simulation(x=x, y=y, areatype=AreaType.woodlands, num_search_targets=1)
-    simulation.run_simulation(30)
+    # simulation = Simulation()
+    # simulation.setup_simulation(x=x, y=y, areatype=AreaType.woodlands, num_search_targets=1)
+    # simulation.run_simulation(30)
 
     ga = GeneticAlgorithm()
-    ga.run(1, 40)
+    ga.run(1, 40, 72)
 
     # print("Start Creating Neural Network")
     # nn = NeuralNetwork()

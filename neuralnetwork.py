@@ -434,6 +434,9 @@ class NeuralNetwork:
             return
         # update the neural network to the new neural network size and structure
         self.__layers_size  = weights.layer_size
+        self.__num_layers = max(self.__layers_size, key= int)
+
+        # replaces the weights for each neuron of the neural network
         for neuron_id in weights.weights.keys():
             self.__insert_weights(neuron_id, NeuronWeights(weights.weights[neuron_id]))
 

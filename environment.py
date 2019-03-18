@@ -20,8 +20,10 @@ class Environment:
     def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0):
         self.__areatype             = areatype
         self.__grid                 = { (int, int) : Tile }
-        self.__targets              = { (int, int) : TileTargetInfo }
+        self.__home_coord           = (0, 0)
         self.__num_targets          = num_targets
+        self.__searchagents         = { int : (int, int) } # search agent ID : coordinates
+        self.__targets              = { (int, int) : TileTargetInfo }
         self.__x                    = x
         self.__y                    = y
 
@@ -62,6 +64,13 @@ class Environment:
         temp.set_tile_type(temp_tiletype)
 
         return temp
+
+    def add_search_agents(self, num_searchagents = 0):
+        for i in range(num_searchagents):
+            self.__searchagents[i] = self.__home_coord
+
+    def change_home_tile(self, x = 0, y = 0):
+        self.__home_coord = (x, y)
 
     def check_home(self, x = 0, y = 0):
         if self.check_tile(x, y) == True:
