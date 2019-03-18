@@ -26,7 +26,7 @@ class AreaTileProbabilities:
                                 (TileType.river, 9), 
                                 (TileType.swamp, 10)]
 
-        self.__islands = [      (TileType.forest, 3),
+        self.__islands =        [(TileType.forest, 3),
                                 (TileType.mountain, 4),
                                 (TileType.plains, 6),
                                 (TileType.pond, 6),

@@ -3,6 +3,10 @@
 import areatype
 import enum
 
+class TileTargetInfo(enum.IntEnum):
+    target      = 0
+    falsepos    = 1
+
 class TileType(enum.IntEnum):
     void        = 0
     forest      = 1
@@ -13,7 +17,10 @@ class TileType(enum.IntEnum):
     swamp       = 6
     home        = 7
 
-def get_tiletypes_after(self, index_tiletype = TileType.void):
+def resolve_tiletype_as_float(tiletype = TileType.void):
+    return float(tiletype) / 10
+
+def get_tiletypes_after(index_tiletype = TileType.void):
     """
         TODO: FIX return_tiles is somehow empty
     """

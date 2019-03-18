@@ -2,16 +2,18 @@
 
 from areatype import AreaType, AreaTileProbabilities, generate_random_tile
 from collections import defaultdict
-from tile import DisregardTile, get_tiletypes_after, Tile, TileType
+from tile import DisregardTile, get_tiletypes_after, resolve_tiletype_as_float, Tile, TileTargetInfo, TileType
 
 import random
 
 class AdjacentTiles:
 
     def __init__(self):
-        # there are a total of 8 tiles adjacent to the caller tile
-        # initially, these adjacent tiles are set to void which if
-        # used should be disregarded
+        """-----------------------------------------------------------
+            There are a total of 8 tiles adjacent to the caller tile.
+            Initially, these adjacent tiles are set to void which if
+            used should be disregarded.
+        -----------------------------------------------------------"""
         self.NW = TileType.void
         self.N  = TileType.void
         self.NE = TileType.void
@@ -166,8 +168,21 @@ class AdjacentTiles:
                 return probability
         return generate_random_tile(areatype)
 
-class Environment:
+    def listify(self):
+        return_list = list()
+        
+        return_list.append(resolve_tiletype_as_float(self.NW))
+        return_list.append(resolve_tiletype_as_float(self.N))
+        return_list.append(resolve_tiletype_as_float(self.NE))
+        return_list.append(resolve_tiletype_as_float(self.E))
+        return_list.append(resolve_tiletype_as_float(self.SE))
+        return_list.append(resolve_tiletype_as_float(self.S))
+        return_list.append(resolve_tiletype_as_float(self.SW))
+        return_list.append(resolve_tiletype_as_float(self.W))
+        
+        return return_list
 
+class Environment:
     """-----------------------------------------------------------------------------
 
         This class is used by the class simulation in order to train and test
@@ -175,14 +190,13 @@ class Environment:
         each round takes 6 seconds, agents can move in eight cardinal directions,
         and the grid is made up of tiles that loosely correspond to the MTG lands -
         (the only amend is islands would be a pain to program so they are instead
-        switched out for rivers and ponds)
+        switched out for rivers and ponds).
 
     -----------------------------------------------------------------------------"""
-
     def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0):
         self.__areatype             = areatype
         self.__grid                 = { (int, int) : Tile }
-        self.__list_of_falsepos     = { (int, int) }
+        self.__targets              = { (int, int) : TileTargetInfo }
         self.__num_targets          = num_targets
         self.__x                    = x
         self.__y                    = y
@@ -194,7 +208,7 @@ class Environment:
     def __generate_null_tile(self, x, y):
         """---------------------------------------------------------------------------------
 
-            This function creates a non-usaable tile to be used to initialize the grid
+            This function creates a non-usaable tile to be used to initialize the grid.
         
         ---------------------------------------------------------------------------------"""
         # creates a temp tile that will be returned by the function
@@ -206,7 +220,8 @@ class Environment:
     def __generate_tile(self, x, y, frequency_falsepos):
         """---------------------------------------------------------------
 
-            This function controls how the environment class 
+            This function controls how the environment class generates a
+            tile at a certain coordinate.
             
         ---------------------------------------------------------------"""
         # creates a temp tile that will be returned by the function
@@ -302,9 +317,11 @@ class Environment:
             if random_roll < frequency_falsepos:
                 print("Set target - falsepos")
                 self.__grid[random_x, random_y].set_target(True)
+                self.__targets[random_x, random_y] = TileTargetInfo.falsepos
             else:
                 print("Set target")
                 self.__grid[random_x, random_y].set_target(False)
+                self.__targets[random_x, random_y] = TileTargetInfo.target
                 # the target only counts to the number of valid generated targets if it is not a falsepos
                 self.__generated_num_of_targets += 1
         
@@ -318,7 +335,6 @@ class Environment:
             and returns a class that contains the tiletype of the eight adjacent tiles.
         
         -------------------------------------------------------------------------------"""
-
         # creates a temp AdjacentTiles class to be returned by this function
         return_adjacent_tiles = AdjacentTiles()
         # checks to make sure that the passed in tile is within the confines of the grid
@@ -377,10 +393,16 @@ class Environment:
                                             W=self.__grid[x - 1, y].tiletype())
         return return_adjacent_tiles
 
+    def search_tile(self, x = 1, y = 1, falsepos_rate = 0):
+        coord = (x, y)
+        if coord in self.__targets.keys():
+            if random.randint(1, 10) > falsepos_rate:
+                pass
+
     def set_environment(self, x = 1, y = 1, areatype = AreaType.default, num_targets = 1):
         """------------------------------------------------------------------
 
-            This function is the setter function for the environment class
+            This function is the setter function for the environment class.
         
         ------------------------------------------------------------------"""
         self.__areatype     = areatype

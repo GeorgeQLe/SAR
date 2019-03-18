@@ -4,6 +4,6 @@ from tile import TileType
 
 class TileDifficulty:
     def __init__(self):
-        self.__difficulty = [(
-            (TileType.forest, 3)
-        )]
+        self.__difficulty = [(TileType.forest, 3),
+                            (TileType.mountain, 5),
+                            ]
