@@ -255,7 +255,7 @@ class Neuron:
         self.__ID                   = ID                    # the ID for the neuron
         self.__num_of_connections   = num_of_connections    # the number of neurons that receive the
                                                             # output and weights of this neuron
-        self.__num_of_weights       = num_of_weights
+        self.__num_of_weights       = num_of_weights        # the number of weights held by the neuron
         self.__outputs              = 0.0                   # the result of the function held in the Neuron 
                                                             # that will be passed to all of the neurons in 
                                                             # the next layer (Feedforward)
@@ -434,9 +434,8 @@ class NeuralNetwork:
         neuron_index    = find_neuron_id_in_layer(self.__layers_size, ID)
         return_weights  = { ID : self.__layers[neuron_index][ID - self.__layers_size[neuron_index - 1] - 1].get_output_weights().weights }
 
-        # is a tuple containing a neuron_id (int) and 
-        # a list of weights (double) belonging to the 
-        # corresponding neuron with the neuron_id        
+        # is a tuple containing a neuron_id (int) and a list of weights (double) belonging to the 
+        # corresponding neuron with the neuron_id   
         return return_weights
 
     def set_num_layers(self, num_layers):
