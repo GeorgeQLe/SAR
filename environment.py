@@ -4,6 +4,7 @@ from collections import defaultdict
 from adjacenttiles import AdjacentTiles, AreaType, TileType
 from tile import Tile, TileTargetInfo
 
+from collections import OrderedDict
 import random
 
 class Environment:
@@ -19,7 +20,7 @@ class Environment:
     -----------------------------------------------------------------------------"""
     def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0):
         self.__areatype             = areatype
-        self.__grid                 = { (int, int) : Tile }
+        self.__grid                 = OrderedDict()
         self.__home_coord           = (0, 0)
         self.__num_targets          = num_targets
         self.__searchagents         = { int : (int, int) } # search agent ID : coordinates
@@ -74,6 +75,7 @@ class Environment:
 
     def check_home(self, x = 0, y = 0):
         if self.check_tile(x, y) == True:
+            print("Check home")
             if self.__grid[x, y] == TileType.home:
                 return True
         return False
@@ -87,9 +89,13 @@ class Environment:
         ---------------------------------------------------------------"""
         coord = (x, y)
         # checks to see if the coordinates are in the grid
-        if coord in self.__grid.keys():
-            return False
-        return True
+        for grid_coord in self.__grid.keys():
+            if grid_coord == coord:
+                print("Coords are in grid")
+                return True
+        print("Coords not in grid")
+        return False
+        
 
     def draw(self):
         """------------------------------------------------------------------
@@ -108,7 +114,9 @@ class Environment:
             for y in range(self.__y):
                 print("|", end="")
                 for x in range(self.__x):
-                    if self.__grid[x, y].is_falsepos() == True:
+                    if (x, y) in self.__searchagents:
+                        print("1", end="|")
+                    elif self.__grid[x, y].is_falsepos() == True:
                         print("O", end="|")
                     elif self.__grid[x, y].is_target() == True:
                         print("X", end="|")

@@ -19,9 +19,7 @@ class GeneticAlgorithm:
     def __crossover(self, parent1, parent2):
         pass
 
-    def __generate_new_population(self):
-        self.__current_generation_num       += 1
-    
+    def __generate_new_population(self, layers_size):
         # creates the n number of neural networks that comprise the GA population
         for i in range(self.__number_of_individuals):
             weights = list()
@@ -29,22 +27,29 @@ class GeneticAlgorithm:
             for j in range(self.__number_of_individual_genes):
                 weights.append(round(uniform(0.0, 1.0), 2))
             neuron_weights = NeuronWeights(weights)
-            self.__population.append(neuron_weights)
-        print("Population")
-        counter = 0
-        for weights in self.__population:
-            counter += 1
-            print("Neural Network #", counter, ":", len(weights.weights))
+            self.__population.append({ 0 : neuron_weights.create_from_neural_network_weights(layers_size) })
+        print("Length of population:", len(self.__population))
+        print("Population:", self.__population)
+
+    def __replacement(self):
+        pass
+
+    def __selection(self):
+        pass
 
     def __test_population(self):
         simulation = Simulation()
-        for individual in self.__population:   
-            temp_individual = list()
-            temp_individual.append(individual)
-            simulation.setup_simulation(30, 30, AreaType.woodlands, 1, 1, temp_individual)
-            simulation.run_simulation(30)
+        # for each individual of the population, perform a run of the simulation
+        for individual in self.__population:
+            # separates the neural network weights
+            for neuralnetworkweights in individual.keys():
+                print("Neural network weights:", individual[neuralnetworkweights])
+                temp_individual = list()
+                temp_individual.append(individual[neuralnetworkweights])
+                simulation.setup_simulation(30, 30, AreaType.woodlands, 1, 1, temp_individual)
+                simulation.run_simulation(20)
 
-    def run(self, num_generations, number_of_individuals, number_of_individual_genes):
+    def run(self, num_generations, number_of_individuals, number_of_individual_genes, layers_size):
         self.__number_of_generations        = num_generations
         self.__number_of_individuals        = number_of_individuals
         self.__number_of_individual_genes   = number_of_individual_genes
@@ -53,6 +58,10 @@ class GeneticAlgorithm:
             self.__current_generation_num       += 1
             if self.__current_generation_num == 1:
                 # create a brand new population
-                self.__generate_new_population()
+                print("Generate new population")
+                self.__generate_new_population(layers_size)
             print("Test population")
             self.__test_population()
+            self.__selection()
+            self.__replacement()
+        print("GA run complete")

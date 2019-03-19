@@ -1,7 +1,7 @@
 # Copyright 2019 George Le
 
 from areatype import AreaType
-from searchagent import Environment, NeuralNetwork, SearchAgent, SearchAgentsType
+from searchagent import Environment, NeuralNetwork, resolve_turn, SearchAgent, SearchAgentsType
 
 class Simulation:
 
@@ -14,6 +14,7 @@ class Simulation:
     def __setup_test_environment(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1):
         print("Setup test environment")
         self.__environment.set_environment(x, y, areatype, num_search_targets)
+        self.__environment.change_home_tile(0, 0)
 
     def __setup_search_agents(self, num_search_agents = 1, population = list()):
         if len(population) != num_search_agents:
@@ -32,14 +33,25 @@ class Simulation:
         # creates a temp population in case there are neuron weights that need to plugged into 
         # neural networks in the population
         temp_population = population
+        # goes through the given population to make sure that all of the population are converted
+        # to neural networks so that they can be plugged into the search agets
         for nn in population:
             if not isinstance(nn, NeuralNetwork):
+                print("Not a neural network in the population, replacing with Neural Network")
                 temp_nn = NeuralNetwork()
-                # TODO
+                temp_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
+                temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
+                temp_nn.create_layer(index= 2, size= 9, last_layer= True)
+                temp_nn.override_weights(nn)
+            temp_population[population.index(nn)] = temp_nn
+        population = temp_population
 
         print("Start creating Search Agent")
+        # for each of the search agents, plug in a neural network into it
         for i in range(num_search_agents):
-            temp = SearchAgent(search_agent_type= SearchAgentsType.drone)
+            temp = SearchAgent(fuel_level=10, max_fuel = 10, search_agent_type= SearchAgentsType.drone, ID= i + 1)
+            print(temp.fuel_level())
+            print("Population #", i + 1, ":", population[i])
             temp.set_brain(population[i])
             self.__searchagents.append(temp)
         self.__environment.add_search_agents(num_search_agents)
@@ -50,9 +62,12 @@ class Simulation:
         for i in range(num_of_turns):
             print("Turn", i + 1)
             for searchagent in self.__searchagents:
-                searchagent.resolve_turn(self.__environment)
+                print("Search agent #", searchagent.get_ID())
+                resolve_turn(searchagent.turn(self.__environment))
+            # self.__environment.draw()
         self.__environment.empty()
 
     def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
         self.__setup_test_environment(x, y, areatype, num_search_agents)
+        print("Search agents:", searchagents)
         self.__setup_search_agents(num_search_agents, searchagents)

@@ -7,6 +7,7 @@ from neuralnetwork import NeuralNetwork, NeuralNetworkInputs
 from geneticalgorithm import GeneticAlgorithm, Simulation
 from searchagent import SearchAgent
 
+from collections import OrderedDict
 from random import uniform
 
 def main():
@@ -23,7 +24,9 @@ def main():
     # simulation.run_simulation(30)
 
     ga = GeneticAlgorithm()
-    ga.run(1, 40, 72)
+    ga.run(1, 1, 72, OrderedDict((
+        (0, 9), (1, 13), (2, 22)
+    )))
 
     # print("Start Creating Neural Network")
     # nn = NeuralNetwork()

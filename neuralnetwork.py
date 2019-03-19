@@ -13,15 +13,15 @@ class NeuralNetworkInputs:
 
     --------------------------------------------------------------------------"""
     def __init__(self, inputs = list()):
-        print("In Creating Neural Network Inputs")
-        print("Inputs:", inputs)
+        # print("In Creating Neural Network Inputs")
+        # print("Inputs:", inputs)
         self.__good_inputs   = False
         self.__inputs        = inputs
         self.__num_of_inputs = len(inputs)
 
         if len(self.__verify_inputs(self.__inputs)) > 0:
             self.__good_inputs = True
-            print("Good inputs")
+            # print("Good inputs")
 
     def __verify_inputs(self, inputs):
         """---------------------------------------------------------------------
@@ -65,8 +65,8 @@ class NeuralNetworkWeights:
         the output weights into the corresponding neuron.
     -----------------------------------------------------------------------------"""
     def __init__(self, layers_size = OrderedDict(), num_of_weights = 1, weights = OrderedDict()):
-        print("In Creating Neural Network Weights")
-        print("Weights:", weights)
+        # print("In Creating Neural Network Weights")
+        # print("Weights:", weights)
         self.__good_layer_info  = False             # the status of the information about the layers
         self.__good_weights     = False             # the status of the weights
         self.__layers_size      = layers_size       # layer index (int) : layer size (int)
@@ -75,10 +75,10 @@ class NeuralNetworkWeights:
 
         if len(self.__verify_weights(self.__weights)) > 0:
             self.__good_weights = True
-            print("Good weights")
+            # print("Good weights")
         if len(self.__verify_layer_info(self.__layers_size)) > 0:
             self.__good_layer_info = True
-            print("Good layer size")
+            # print("Good layer size")
 
     def __verify_layer_info(self, layer_info):
         if isinstance(layer_info, OrderedDict):
@@ -160,7 +160,7 @@ class NeuronInputs:
 
         if len(self.__verify_inputs(self.__inputs)) > 0:
             self.__good_inputs = True
-            print("Good inputs")
+            # print("Good inputs")
 
     def __verify_inputs(self, inputs):
         """---------------------------------------------------------------------
@@ -209,7 +209,7 @@ class NeuronWeights:
 
         if len(self.__verify_weights(self.__weights)) > 0:
             self.__good_weights = True
-            print("Good weights")
+            # print("Good weights")
 
     def __verify_weights(self, weights):
         """---------------------------------------------------------------------
@@ -232,6 +232,9 @@ class NeuronWeights:
             return True
         return False
 
+    def create_from_neural_network_weights(self, layers_size = OrderedDict()):
+        return NeuralNetworkWeights(layers_size, self.__num_of_weights, self.__weights)
+
     @property
     def weights(self):
         if self.__good_weights:    
@@ -253,9 +256,9 @@ class Neuron:
 
     -----------------------------------------------------------------------------"""
     def __init__(self, ID = 0, num_of_connections = 1, num_of_weights = 1, weights = NeuronWeights()):
-        print("Create Neuron")
-        print("ID:", ID, "Number of connections:", num_of_connections, "Number of weights:", num_of_weights)
-        print("Weights:", weights.weights)
+        # print("Create Neuron")
+        # print("ID:", ID, "Number of connections:", num_of_connections, "Number of weights:", num_of_weights)
+        # print("Weights:", weights.weights)
         self.__ID                   = ID                    # the ID for the neuron
         self.__num_of_connections   = num_of_connections    # the number of neurons that receive the
                                                             # output and weights of this neuron
@@ -264,7 +267,7 @@ class Neuron:
                                                             # that will be passed to all of the neurons in 
                                                             # the next layer (Feedforward)
         self.__output_weights       = NeuronWeights()
-        print("Weights:", weights)
+        # print("Weights:", weights)
         if isinstance(weights, NeuronWeights):
             self.__output_weights       = weights
         elif isinstance(weights, list):
@@ -280,21 +283,21 @@ class Neuron:
         sum = 0.0
         # If the neuron is in the input layer, then the input is a single float
         # and there are no weights.
-        print(len(input_weights.weights))
-        print(isinstance(inputs, float))
+        # print(len(input_weights.weights))
+        # print(isinstance(inputs, float))
         if len(input_weights.weights) == 0 and isinstance(inputs, float) == True:
             sum = inputs
         # For the hidden and output layer, the sum is assigned the value of the input multipied 
         # by each of the input weights sum = wi * xi, where wi is the weight at the i'th position
         # and xi is the input in the i'th position.
         else:
-            print("Neuron #", self.__ID, ":") 
+            # print("Neuron #", self.__ID, ":") 
             weight          = input_weights.weights
             neuron_inputs   = inputs.inputs
             for i in range(len(weight)):
-                print(weight[i], "*", neuron_inputs[i], end="=")
+                # print(weight[i], "*", neuron_inputs[i], end="=")
                 sum = round(weight[i] * neuron_inputs[i], 4)
-                print(sum)
+                # print(sum)
         # sum - bias
         sum -= bias
         self.__output = round(self.__sigmoid(sum), 4)
@@ -326,7 +329,7 @@ class NeuralNetwork:
     # To construct a neural network, the user will need to pass in the array of 
     # input values for the input layer of the neural network
     def __init__(self, inputs = NeuralNetworkInputs(), num_layers = 3):
-        print("Creating Neural Network")
+        # print("Creating Neural Network")
         self.__input            = inputs
         self.__layers           = OrderedDict() # this OrderedDict() holds key-value pairs:
                                                 # (layer index : list(Neuron))
@@ -342,7 +345,7 @@ class NeuralNetwork:
         self.__layers[neuron_index][ID - self.__layers_size[neuron_index] - 1].set_output_weights(weights)
 
     def create_layer(self, index = 0, size = 1, size_of_next_layer = 0, last_layer = False):
-        print("Creating layer #", index)
+        # print("Creating layer #", index)
         if index >= 0 and index < self.__num_layers and size > 0:
             # temp variable that stores all of the neurons for 
             # a particular layer 
@@ -359,7 +362,7 @@ class NeuralNetwork:
                 input_weights = list()
                 for j in range(size_of_next_layer):
                     input_weights.append(round(uniform(0.0, 1.0), 2))
-                print("Input weights", input_weights)
+                # print("Input weights", input_weights)
                 neurons.append(Neuron(ID = self.__neuron_ID, num_of_connections=size_of_next_layer, num_of_weights=len(input_weights), weights = NeuronWeights(input_weights)))
                 self.__neuron_ID += 1
             # add the list of neurons to the neural network
@@ -373,8 +376,8 @@ class NeuralNetwork:
                     # for each neuron in the layer
                     for neuron in self.__layers[layer_index]:
                         self.__num_weights += neuron.get_num_of_weights()
-            print("Layers size:", self.__layers_size)
-            print("Number of weights in the neural network:", self.__num_weights)
+            # print("Layers size:", self.__layers_size)
+            # print("Number of weights in the neural network:", self.__num_weights)
 
     def evaluate(self, inputs = NeuralNetworkInputs()):
         if len(inputs.inputs) != len(self.__layers[0]):
@@ -394,19 +397,19 @@ class NeuralNetwork:
                     list_weights    = list()
                     list_inputs     = list()
                     for prev_neuron in self.__layers[layer_index - 1]:
-                        print("Prev neuron weights:", prev_neuron.get_output_weights().weights)
+                        # print("Prev neuron weights:", prev_neuron.get_output_weights().weights)
                         list_weights.append(prev_neuron.get_output_weights().weights[neuron.ID() - self.__layers_size[layer_index] - 1])
                         list_inputs.append(prev_neuron.get_output())
-                    print("Prev neuron outputs:", list_inputs)
+                    # print("Prev neuron outputs:", list_inputs)
                     input_weights = NeuronWeights(list_weights)
                     neuron_inputs = NeuronInputs(list_inputs)
 
-                    print("Neuron ID:", neuron.ID())
+                    # print("Neuron ID:", neuron.ID())
                     print("Evaluate: ", neuron.evaluate_neuron(inputs= neuron_inputs, input_weights= input_weights))
         neural_network_output = list()
         for neuron in self.__layers[2]:
             neural_network_output.append(self.__layers[2][neuron.ID() - self.__layers_size[2] - 1].get_output())
-        print("Number of neurons", self.__num_neurons)
+        # print("Number of neurons", self.__num_neurons)
         return neural_network_output
 
     def get_weights(self):
