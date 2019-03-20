@@ -4,7 +4,7 @@ from neuralnetwork import NeuronWeights
 from simulation import AreaType, SearchAgent, Simulation
 
 from collections import OrderedDict
-from random import uniform
+from random import randint, uniform
 
 class GeneticAlgorithm:
 
@@ -15,6 +15,7 @@ class GeneticAlgorithm:
         self.__number_of_individuals        = 0 # number of individuals in each generations
         self.__old_populations              = { int : list() } # this is a dict holding a key-value pair (population index (int) : list(Neural Network Weights)) 
         self.__population                   = list()
+        self.__scores                       = OrderedDict()
 
     def __crossover(self, parent1, parent2):
         pass
@@ -28,22 +29,30 @@ class GeneticAlgorithm:
                 weights.append(round(uniform(0.0, 1.0), 2))
             neuron_weights = NeuronWeights(weights)
             self.__population.append({ 0 : neuron_weights.create_from_neural_network_weights(layers_size) })
-        print("Length of population:", len(self.__population))
-        print("Population:", self.__population)
-
     def __replacement(self):
-        pass
+        for ID in self.__scores.keys():
+            pass
 
     def __selection(self):
-        pass
+        return_parents = list()
+        # to select two parents
+        for n in range(2):
+            # from four possible randomly selected individuals of the population
+            for i in range(4):
+                tournament_pool = dict()
+                random_roll = randint(0, self.__number_of_individuals - 1)
+                
+                
 
     def __test_population(self):
         simulation = Simulation()
+        counter = 1
         # for each individual of the population, perform a run of the simulation
         for individual in self.__population:
             # separates the neural network weights
             for neuralnetworkweights in individual.keys():
-                print("Neural network weights:", individual[neuralnetworkweights])
+                print("Simulation number:", counter)
+                counter += 1
                 temp_individual = list()
                 temp_individual.append(individual[neuralnetworkweights])
                 simulation.setup_simulation(30, 30, AreaType.woodlands, 1, 1, temp_individual)
@@ -61,7 +70,7 @@ class GeneticAlgorithm:
                 print("Generate new population")
                 self.__generate_new_population(layers_size)
             print("Test population")
-            self.__test_population()
+            self.__scores = self.__test_population()
             self.__selection()
             self.__replacement()
         print("GA run complete")

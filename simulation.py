@@ -1,7 +1,10 @@
 # Copyright 2019 George Le
 
 from areatype import AreaType
-from searchagent import Environment, NeuralNetwork, resolve_turn, SearchAgent, SearchAgentsType
+from grader import grade
+from searchagent import Environment, NeuralNetwork, SearchAgent, SearchAgentsType
+
+from collections import OrderedDict
 
 class Simulation:
 
@@ -37,7 +40,6 @@ class Simulation:
         # to neural networks so that they can be plugged into the search agets
         for nn in population:
             if not isinstance(nn, NeuralNetwork):
-                print("Not a neural network in the population, replacing with Neural Network")
                 temp_nn = NeuralNetwork()
                 temp_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
                 temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
@@ -49,23 +51,26 @@ class Simulation:
         print("Start creating Search Agent")
         # for each of the search agents, plug in a neural network into it
         for i in range(num_search_agents):
-            temp = SearchAgent(fuel_level=10, max_fuel = 10, search_agent_type= SearchAgentsType.drone, ID= i + 1)
+            temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= i + 1)
             print(temp.fuel_level())
             print("Population #", i + 1, ":", population[i])
             temp.set_brain(population[i])
             self.__searchagents.append(temp)
         self.__environment.add_search_agents(num_search_agents)
 
-    def run_simulation(self, num_of_turns = 30):
+    def run_simulation(self, num_of_turns = 300):
+        return_searchagents = OrderedDict()
         self.__environment.generate(self.__frequency_falsepos)
-        print("Environment generated")
+
         for i in range(num_of_turns):
             print("Turn", i + 1)
             for searchagent in self.__searchagents:
-                print("Search agent #", searchagent.get_ID())
-                resolve_turn(searchagent.turn(self.__environment))
-            # self.__environment.draw()
+                self.__environment.move_search_agent(searchagent_ID= searchagent.get_ID(), new_position= searchagent.turn(self.__environment))
+            self.__environment.draw()
+        for searchagent in self.__searchagents:
+            return_searchagents[searchagent] = grade(searchagent)
         self.__environment.empty()
+        return return_searchagents
 
     def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
         self.__setup_test_environment(x, y, areatype, num_search_agents)

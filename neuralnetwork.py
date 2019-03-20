@@ -385,11 +385,10 @@ class NeuralNetwork:
             return
 
         for layer_index in self.__layers.keys():
-            print("Layer: ", layer_index)
             for neuron in self.__layers[layer_index]:
                 # for the input layer
                 if layer_index == 0:
-                    print("Evaluate: ", neuron.evaluate_neuron(inputs= inputs.inputs[neuron.ID() - 1]))
+                    neuron.evaluate_neuron(inputs= inputs.inputs[neuron.ID() - 1])
                 else:
                     # If the current layer is not the input layer, then collect the weights from the previous
                     # layer for the current neuron. Do the same for the outputs from the previous neuron -> inputs
@@ -405,7 +404,7 @@ class NeuralNetwork:
                     neuron_inputs = NeuronInputs(list_inputs)
 
                     # print("Neuron ID:", neuron.ID())
-                    print("Evaluate: ", neuron.evaluate_neuron(inputs= neuron_inputs, input_weights= input_weights))
+                    neuron.evaluate_neuron(inputs= neuron_inputs, input_weights= input_weights)
         neural_network_output = list()
         for neuron in self.__layers[2]:
             neural_network_output.append(self.__layers[2][neuron.ID() - self.__layers_size[2] - 1].get_output())
@@ -413,7 +412,6 @@ class NeuralNetwork:
         return neural_network_output
 
     def get_weights(self):
-
         # is an ordereddict that has a key-value pair
         # neuron_id (int) : list(neuron_weights (float))
         weights = OrderedDict()

@@ -24,7 +24,7 @@ def main():
     # simulation.run_simulation(30)
 
     ga = GeneticAlgorithm()
-    ga.run(1, 1, 72, OrderedDict((
+    ga.run(1, 40, 72, OrderedDict((
         (0, 9), (1, 13), (2, 22)
     )))
 

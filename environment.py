@@ -75,7 +75,6 @@ class Environment:
 
     def check_home(self, x = 0, y = 0):
         if self.check_tile(x, y) == True:
-            print("Check home")
             if self.__grid[x, y] == TileType.home:
                 return True
         return False
@@ -91,9 +90,7 @@ class Environment:
         # checks to see if the coordinates are in the grid
         for grid_coord in self.__grid.keys():
             if grid_coord == coord:
-                print("Coords are in grid")
                 return True
-        print("Coords not in grid")
         return False
         
 
@@ -114,9 +111,10 @@ class Environment:
             for y in range(self.__y):
                 print("|", end="")
                 for x in range(self.__x):
-                    if (x, y) in self.__searchagents:
-                        print("1", end="|")
-                    elif self.__grid[x, y].is_falsepos() == True:
+                    for searchagent in self.__searchagents:
+                        if searchagent:
+                            print("1", end="|")
+                    if self.__grid[x, y].is_falsepos() == True:
                         print("O", end="|")
                     elif self.__grid[x, y].is_target() == True:
                         print("X", end="|")
@@ -188,6 +186,9 @@ class Environment:
         
         # the grid now is ready for use
         self.__good_grid = True
+
+    def move_search_agent(self, searchagent_ID = 0, new_position = (0, 0)):
+        self.__searchagents[searchagent_ID] = new_position
 
     def search_adjacent_tiles(self, x, y):
         """-------------------------------------------------------------------------------
