@@ -66,7 +66,7 @@ class Simulation:
             print("Turn", i + 1)
             for searchagent in self.__searchagents:
                 self.__environment.move_search_agent(searchagent_ID= searchagent.get_ID(), new_position= searchagent.turn(self.__environment))
-            self.__environment.draw()
+            # self.__environment.draw()
         for searchagent in self.__searchagents:
             return_searchagents[searchagent] = grade(searchagent)
         self.__environment.empty()

@@ -23,7 +23,7 @@ class Environment:
         self.__grid                 = OrderedDict()
         self.__home_coord           = (0, 0)
         self.__num_targets          = num_targets
-        self.__searchagents         = { int : (int, int) } # search agent ID : coordinates
+        self.__searchagents         = OrderedDict() # search agent ID : coordinates
         self.__targets              = { (int, int) : TileTargetInfo }
         self.__x                    = x
         self.__y                    = y
@@ -112,7 +112,8 @@ class Environment:
                 print("|", end="")
                 for x in range(self.__x):
                     for searchagent in self.__searchagents:
-                        if searchagent:
+                        print("Search agents:", self.__searchagents)
+                        if searchagent == (x, y):
                             print("1", end="|")
                     if self.__grid[x, y].is_falsepos() == True:
                         print("O", end="|")
@@ -145,6 +146,8 @@ class Environment:
         
         -----------------------------------------------------------------------------------------------------"""
         self.__grid.clear()
+        self.__searchagents.clear()
+        self.__targets.clear()
         self.__good_grid = False
 
     def generate(self, frequency_falsepos):
@@ -188,6 +191,7 @@ class Environment:
         self.__good_grid = True
 
     def move_search_agent(self, searchagent_ID = 0, new_position = (0, 0)):
+        print("Environment Update New Position:", new_position)
         self.__searchagents[searchagent_ID] = new_position
 
     def search_adjacent_tiles(self, x, y):
