@@ -29,7 +29,7 @@ class Simulation:
                 difference_population = num_search_agents - len(population)
                 for i in range(difference_population):
                     temp_nn = NeuralNetwork(num_layers= 3)
-                    temp_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
+                    temp_nn.create_layer(index= 0, size= 11, size_of_next_layer= 4)
                     temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
                     temp_nn.create_layer(index= 2, size= 9, last_layer= True)
                     population.append(temp_nn)
@@ -41,7 +41,7 @@ class Simulation:
         for nn in population:
             if not isinstance(nn, NeuralNetwork):
                 temp_nn = NeuralNetwork()
-                temp_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
+                temp_nn.create_layer(index= 0, size= 11, size_of_next_layer= 4)
                 temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
                 temp_nn.create_layer(index= 2, size= 9, last_layer= True)
                 temp_nn.override_weights(nn)
@@ -66,10 +66,11 @@ class Simulation:
             print("Turn", i + 1)
             for searchagent in self.__searchagents:
                 self.__environment.move_search_agent(searchagent_ID= searchagent.get_ID(), new_position= searchagent.turn(self.__environment))
-            # self.__environment.draw()
+            self.__environment.draw()
         for searchagent in self.__searchagents:
-            return_searchagents[searchagent] = grade(searchagent)
+            return_searchagents[self.__searchagents.index(searchagent)] = grade(searchagent)
         self.__environment.empty()
+        print("Return searchagents:", return_searchagents)
         return return_searchagents
 
     def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1, searchagents = list()):

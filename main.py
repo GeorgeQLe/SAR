@@ -8,12 +8,12 @@ from geneticalgorithm import GeneticAlgorithm, Simulation
 from searchagent import SearchAgent
 
 from collections import OrderedDict
-from random import uniform
+from random import randint, uniform
 
 def main():
     x = 30
     y = 30
-    
+
     # if len(argv) > 1:
     #     if len(argv) == 3:
     #         x = int(argv[1])
@@ -24,8 +24,8 @@ def main():
     # simulation.run_simulation(30)
 
     ga = GeneticAlgorithm()
-    ga.run(1, 40, 72, OrderedDict((
-        (0, 9), (1, 13), (2, 22)
+    ga.run(1, 10, 80, OrderedDict((
+        (0, 11), (1, 15), (2, 24)
     )))
 
     # print("Start Creating Neural Network")

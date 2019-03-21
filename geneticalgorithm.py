@@ -14,11 +14,14 @@ class GeneticAlgorithm:
         self.__number_of_individual_genes   = 0 # number of genes that belong to an individual
         self.__number_of_individuals        = 0 # number of individuals in each generations
         self.__old_populations              = { int : list() } # this is a dict holding a key-value pair (population index (int) : list(Neural Network Weights)) 
-        self.__population                   = list()
-        self.__scores                       = OrderedDict()
+        self.__population                   = list()        # this is a list holding the GA's current population
+        self.__scores                       = OrderedDict() # this is a dict holding a key-value pair ()
 
     def __crossover(self, parent1, parent2):
-        pass
+        print(len(parent1), len(parent2))
+        # single point crossover
+        for i in range(len(parent1)):
+            pass
 
     def __generate_new_population(self, layers_size):
         # creates the n number of neural networks that comprise the GA population
@@ -29,6 +32,7 @@ class GeneticAlgorithm:
                 weights.append(round(uniform(0.0, 1.0), 2))
             neuron_weights = NeuronWeights(weights)
             self.__population.append({ 0 : neuron_weights.create_from_neural_network_weights(layers_size) })
+
     def __replacement(self):
         for ID in self.__scores.keys():
             pass
@@ -47,16 +51,20 @@ class GeneticAlgorithm:
     def __test_population(self):
         simulation = Simulation()
         counter = 1
+        return_pop_info = OrderedDict()
         # for each individual of the population, perform a run of the simulation
         for individual in self.__population:
             # separates the neural network weights
             for neuralnetworkweights in individual.keys():
                 print("Simulation number:", counter)
                 counter += 1
-                temp_individual = list()
-                temp_individual.append(individual[neuralnetworkweights])
-                simulation.setup_simulation(30, 30, AreaType.woodlands, 1, 1, temp_individual)
-                simulation.run_simulation(20)
+                temp_individuals = list()
+                temp_individuals.append(individual[neuralnetworkweights])
+                print("NN weights:", neuralnetworkweights)
+                print("Individual:", individual[neuralnetworkweights])
+                simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, temp_individuals)
+                return_pop_info[counter] = simulation.run_simulation(30)
+            return return_pop_info
 
     def run(self, num_generations, number_of_individuals, number_of_individual_genes, layers_size):
         self.__number_of_generations        = num_generations

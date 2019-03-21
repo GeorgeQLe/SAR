@@ -109,7 +109,11 @@ class SearchAgent:
         adj_list = adjacent_tiles.listify()
         adj_list.append(resolve_tiletype_as_float(current_tiletype))
 
-        decision_list = self.__brain.evaluate(NeuralNetworkInputs(adj_list))
+        nn_inputs = adj_list
+        nn_inputs.append(float(environment.get_tiletype_at_coord(self.__position[0], self.__position[1])))
+        nn_inputs.append(float(environment.get_number_of_targets() - self.__targets_found))
+
+        decision_list = self.__brain.evaluate(NeuralNetworkInputs(nn_inputs))
         decision = decision_list.index(max(decision_list))
         
         move_result = self.__move(direction=decision, environment=environment)

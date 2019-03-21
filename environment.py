@@ -23,7 +23,7 @@ class Environment:
         self.__grid                 = OrderedDict()
         self.__home_coord           = (0, 0)
         self.__num_targets          = num_targets
-        self.__searchagents         = OrderedDict() # search agent ID : coordinates
+        self.__searchagents         = { int : (int, int) } # search agent ID : coordinates
         self.__targets              = { (int, int) : TileTargetInfo }
         self.__x                    = x
         self.__y                    = y
@@ -67,7 +67,7 @@ class Environment:
         return temp
 
     def add_search_agents(self, num_searchagents = 0):
-        for i in range(num_searchagents):
+        for i in range(num_searchagents - 1):
             self.__searchagents[i] = self.__home_coord
 
     def change_home_tile(self, x = 0, y = 0):
@@ -104,6 +104,9 @@ class Environment:
             agent.
 
         ------------------------------------------------------------------"""
+        print("Search agents info")
+        for i in range(len(self.__searchagents) - 1):
+            print(self.__searchagents[i + 1])
         if self.__good_grid == True:
             for i in range(self.__x * 2 + 1):
                 print("-", end="")
@@ -111,28 +114,31 @@ class Environment:
             for y in range(self.__y):
                 print("|", end="")
                 for x in range(self.__x):
-                    for searchagent in self.__searchagents:
-                        print("Search agents:", self.__searchagents)
-                        if searchagent == (x, y):
+                    has_agent = False
+                    for i in range(len(self.__searchagents) - 1):
+                        if self.__searchagents[i + 1] == (x, y):
                             print("1", end="|")
-                    if self.__grid[x, y].is_falsepos() == True:
-                        print("O", end="|")
-                    elif self.__grid[x, y].is_target() == True:
-                        print("X", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.home:
-                        print("H", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.forest:
-                        print("Y", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.mountain:
-                        print("^", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.plains:
-                        print("_", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.pond:
-                        print("=", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.river:
-                        print("~", end="|")
-                    elif self.__grid[x, y].tiletype() == TileType.swamp:
-                        print(".", end="|")
+                            has_agent = True
+                            break
+                    if has_agent != True:
+                        if self.__grid[x, y].tiletype() == TileType.home:
+                            print("H", end="|")
+                        if self.__grid[x, y].is_falsepos() == True:
+                            print("O", end="|")
+                        elif self.__grid[x, y].is_target() == True:
+                            print("X", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.forest:
+                            print("Y", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.mountain:
+                            print("^", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.plains:
+                            print("_", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.pond:
+                            print("=", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.river:
+                            print("~", end="|")
+                        elif self.__grid[x, y].tiletype() == TileType.swamp:
+                            print(".", end="|")
                 print("")
                 for i in range(self.__x * 2 + 1):
                     print("-", end="")
@@ -146,8 +152,6 @@ class Environment:
         
         -----------------------------------------------------------------------------------------------------"""
         self.__grid.clear()
-        self.__searchagents.clear()
-        self.__targets.clear()
         self.__good_grid = False
 
     def generate(self, frequency_falsepos):
@@ -190,9 +194,17 @@ class Environment:
         # the grid now is ready for use
         self.__good_grid = True
 
-    def move_search_agent(self, searchagent_ID = 0, new_position = (0, 0)):
-        print("Environment Update New Position:", new_position)
+    def get_number_of_targets(self):
+        return len(self.__targets)
+
+    def get_tiletype_at_coord(self, x = 0, y = 0):
+        if self.check_tile(x, y) == True:
+            return self.__grid[x, y].tiletype()
+
+    def move_search_agent(self, searchagent_ID = -1, new_position = (-1, -1)):
         self.__searchagents[searchagent_ID] = new_position
+        print("Environment Update New Position", self.__searchagents[searchagent_ID])
+        print("All search agents:", self.__searchagents)
 
     def search_adjacent_tiles(self, x, y):
         """-------------------------------------------------------------------------------
