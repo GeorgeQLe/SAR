@@ -27,11 +27,14 @@ class GeneticAlgorithm:
         # creates the n number of neural networks that comprise the GA population
         for i in range(self.__number_of_individuals):
             weights = list()
-            # creates the 72 weights of a neural network
+            # creates the 80 weights of a neural network
             for j in range(self.__number_of_individual_genes):
                 weights.append(round(uniform(0.0, 1.0), 2))
             neuron_weights = NeuronWeights(weights)
-            self.__population.append({ 0 : neuron_weights.create_from_neural_network_weights(layers_size) })
+            self.__population.append(neuron_weights.create_from_neural_network_weights(layers_size))
+            
+            for nn_weight in self.__population:
+                print(nn_weight.weights)
 
     def __replacement(self):
         for ID in self.__scores.keys():
@@ -77,8 +80,8 @@ class GeneticAlgorithm:
                 # create a brand new population
                 print("Generate new population")
                 self.__generate_new_population(layers_size)
-            print("Test population")
-            self.__scores = self.__test_population()
-            self.__selection()
-            self.__replacement()
+            #print("Test population")
+            #self.__scores = self.__test_population()
+            #self.__selection()
+            #self.__replacement()
         print("GA run complete")
