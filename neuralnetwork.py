@@ -233,7 +233,12 @@ class NeuronWeights:
         return False
 
     def create_from_neural_network_weights(self, layers_size = OrderedDict()):
-        return NeuralNetworkWeights(layers_size, self.__num_of_weights, self.__weights)
+        incoming_weights = OrderedDict()
+        for layer in layers_size.keys():
+            for i in range(layers_size[layer]):
+                incoming_weights[i] = self.__weights
+        print(incoming_weights)
+        return NeuralNetworkWeights(layers_size, self.__num_of_weights, incoming_weights)
 
     @property
     def weights(self):
@@ -274,7 +279,7 @@ class Neuron:
             self.__output_weights       = NeuronWeights(weights=weights)
 
     def __sigmoid(self, input):
-        return (1.0 / (1.0 + exp(-input)))
+        return (1.0 / (1.0 + exp(input * -1)))
 
     def __str__(self):
         return str(self.__output_weights)
@@ -313,12 +318,9 @@ class Neuron:
         return self.__output
     def get_output_weights(self):
         return self.__output_weights
-
     def set_output_weights(self, weights = NeuronWeights()):
         if weights.check_weights() == True:
             self.__output_weights = weights
-        else:
-            print("Bad weights")
 
 class NeuralNetwork:
     """-----------------------------------------------------------------------------

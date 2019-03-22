@@ -107,17 +107,19 @@ class SearchAgent:
     def __think(self, environment = Environment(), current_tiletype = TileType.void):
         adjacent_tiles = self.__get_adjacent_tiles(environment)
         adj_list = adjacent_tiles.listify()
-        adj_list.append(resolve_tiletype_as_float(current_tiletype))
+        adj_list.append(float(self.__fuel_level))
 
         nn_inputs = adj_list
-        nn_inputs.append(float(environment.get_tiletype_at_coord(self.__position[0], self.__position[1])))
-        nn_inputs.append(float(environment.get_number_of_targets() - self.__targets_found))
+        nn_inputs.append(float(self.__steps_taken))
+        nn_inputs.append(float((environment.get_number_of_targets() - self.__targets_found)))
 
+        print(nn_inputs)
         decision_list = self.__brain.evaluate(NeuralNetworkInputs(nn_inputs))
+        print(decision_list)
         decision = decision_list.index(max(decision_list))
-        
+        print(decision)
         move_result = self.__move(direction=decision, environment=environment)
-
+        print(move_result)
         if isinstance(move_result, TileTargetInfo):
             if move_result == TileTargetInfo.falsepos:
                 self.__falsepos_list.append(self.__position)
@@ -134,11 +136,13 @@ class SearchAgent:
     def empty_fuel(self):
         return self.__empty_fuel
     def falsepos_found(self):
-        return len(self.__falsepos_list)
+        return len(self.__falsepos_list) - 1
     def fuel_level(self):
         return self.__fuel_level
     def get_ID(self):
         return self.__ID
+    def invalid_moves(self):
+        return self.__invalid_moves
     def num_of_repeats(self):
         return len(self.__falsepos_list) - len(set(self.__falsepos_list))
     def path_taken(self):

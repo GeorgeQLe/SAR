@@ -169,7 +169,7 @@ class AdjacentTiles:
     def listify(self):
         return_list = list()
         
-        return_list.append(resolve_tiletype_as_float(self.NW))
+        return_list.append(resolve_tiletype_as_float(self.NW)) 
         return_list.append(resolve_tiletype_as_float(self.N))
         return_list.append(resolve_tiletype_as_float(self.NE))
         return_list.append(resolve_tiletype_as_float(self.E))

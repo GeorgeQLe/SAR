@@ -1,10 +1,12 @@
 # Copyright 2019 George Le
 
-from neuralnetwork import NeuronWeights
+from neuralnetwork import NeuralNetwork
 from simulation import AreaType, SearchAgent, Simulation
 
 from collections import OrderedDict
 from random import randint, uniform
+
+from operator import itemgetter
 
 class GeneticAlgorithm:
 
@@ -14,57 +16,106 @@ class GeneticAlgorithm:
         self.__number_of_individual_genes   = 0 # number of genes that belong to an individual
         self.__number_of_individuals        = 0 # number of individuals in each generations
         self.__old_populations              = { int : list() } # this is a dict holding a key-value pair (population index (int) : list(Neural Network Weights)) 
-        self.__population                   = list()        # this is a list holding the GA's current population
-        self.__scores                       = OrderedDict() # this is a dict holding a key-value pair ()
+        self.__population                   = list() # this is a list holding the GA's current population
+        self.__scores                       = list() # this is a dict holding a list of dicts key-value pair (ID : score)
 
     def __crossover(self, parent1, parent2):
-        print(len(parent1), len(parent2))
         # single point crossover
-        for i in range(len(parent1)):
-            pass
+        for i in range(len(parent1.weights)):
+            nn_weights1 = parent1.weights
+            nn_weights2 = parent2.weights
+            random_roll = randint(1, len(parent1.weights))
+            nn_weights1[random_roll], nn_weights2[random_roll] = nn_weights2[random_roll], nn_weights1[random_roll]
+        # two point crossover
+        random_roll1 = randint(1, len(parent1.weights) - 1)
+        random_roll2 = randint(random_roll1, len(parent2.weights) - 1)
+        index = random_roll1
+        nn_weights1 = parent1.weights
+        nn_weights2 = parent2.weights
+        while index < random_roll2:
+            nn_weights1[index], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
+            index += 1
+        parent1.weights = nn_weights1
+        parent2.weights = nn_weights2
+
+        random_roll = randint(1, 10)
+        if random_roll > 3:
+            random_roll_neuron = randint(1, len(parent1.weights))
+            fifty_fifty = randint(0, 1)
+            if fifty_fifty == 0:
+                mutator_list1 = list()
+                mutator_list2 = list()
+                for i in range(len(parent1.weights[random_roll_neuron])):
+                    mutator_list1.append(round(parent1.weights[random_roll_neuron][i] + uniform(0.0, 1.0), 2))
+                    mutator_list2.append(round(parent2.weights[random_roll_neuron][i] + uniform(0.0, 1.0), 2))
+                parent1.weights[random_roll_neuron] = mutator_list1
+                parent2.weights[random_roll_neuron] = mutator_list1
+            elif fifty_fifty == 0:
+                for i in range(len(parent1.weights[random_roll_neuron])):
+                    mutator_list1.append(round(parent1.weights[random_roll_neuron][i] - uniform(0.0, 1.0), 2))
+                    mutator_list2.append(round(parent2.weights[random_roll_neuron][i] - uniform(0.0, 1.0), 2))
+                parent1.weights[random_roll_neuron] = mutator_list1
+                parent2.weights[random_roll_neuron] = mutator_list2
+        self.__replacement(parent1, parent2)
 
     def __generate_new_population(self, layers_size):
         # creates the n number of neural networks that comprise the GA population
         for i in range(self.__number_of_individuals):
-            weights = list()
-            # creates the 72 weights of a neural network
-            for j in range(self.__number_of_individual_genes):
-                weights.append(round(uniform(0.0, 1.0), 2))
-            neuron_weights = NeuronWeights(weights)
-            self.__population.append({ 0 : neuron_weights.create_from_neural_network_weights(layers_size) })
+            temp_nn = NeuralNetwork(num_layers= 3)
+            temp_nn.create_layer(index= 0, size= 11, size_of_next_layer= 4)
+            temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
+            temp_nn.create_layer(index= 2, size= 9, last_layer= True)
+            self.__population.append(temp_nn.get_weights())
 
-    def __replacement(self):
-        for ID in self.__scores.keys():
-            pass
+    def __replacement(self, parent1, parent2):
+        worst_score = 0
+        second_worst = 0
+        worst_index = len(self.__population) - 1
+        second_index = len(self.__population) - 1
+        index = 1
+        for score in self.__scores:
+            prev_second_worst = second_worst
+            prev_second_worst_index = second_index
+            if score[index] < second_worst:
+                second_worst = score[index]
+                second_index = index
+            if score[index] < worst_score:
+                worst_score = score[index]
+                worst_index = index
 
+                second_worst = prev_second_worst
+                second_index = prev_second_worst_index
+            index += 1
+        self.__population[second_index - 1] = parent2
+        self.__population[worst_index - 1] = parent1
+        
     def __selection(self):
         return_parents = list()
+        exclusion_list = list()
         # to select two parents
-        for n in range(2):
-            # from four possible randomly selected individuals of the population
-            for i in range(4):
-                tournament_pool = dict()
-                random_roll = randint(0, self.__number_of_individuals - 1)
-                
-                
+        while len(return_parents) != 2:
+            random_roll = randint(0, len(self.__population) - 1)
+            if random_roll not in exclusion_list:
+                return_parents.append(self.__population[random_roll])
+                exclusion_list.append(random_roll)
+        self.__crossover(return_parents[0], return_parents[1])
 
     def __test_population(self):
-        simulation = Simulation()
         counter = 1
-        return_pop_info = OrderedDict()
+        return_pop_info = list()
+        
         # for each individual of the population, perform a run of the simulation
         for individual in self.__population:
+            simulation = Simulation()
             # separates the neural network weights
-            for neuralnetworkweights in individual.keys():
-                print("Simulation number:", counter)
-                counter += 1
-                temp_individuals = list()
-                temp_individuals.append(individual[neuralnetworkweights])
-                print("NN weights:", neuralnetworkweights)
-                print("Individual:", individual[neuralnetworkweights])
-                simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, temp_individuals)
-                return_pop_info[counter] = simulation.run_simulation(30)
-            return return_pop_info
+            temp_individuals = list()
+            temp_individuals.append(individual)
+            simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, temp_individuals)
+            return_pop_info.append(simulation.run_simulation(30, counter))
+            temp_individuals.clear()
+            print("Simulation number:", counter, "complete")
+            counter += 1
+        return return_pop_info
 
     def run(self, num_generations, number_of_individuals, number_of_individual_genes, layers_size):
         self.__number_of_generations        = num_generations
@@ -75,10 +126,9 @@ class GeneticAlgorithm:
             self.__current_generation_num       += 1
             if self.__current_generation_num == 1:
                 # create a brand new population
-                print("Generate new population")
                 self.__generate_new_population(layers_size)
-            print("Test population")
             self.__scores = self.__test_population()
-            self.__selection()
-            self.__replacement()
+            print(self.__scores)
+            for i in range(10):
+                self.__selection()
         print("GA run complete")

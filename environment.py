@@ -203,8 +203,6 @@ class Environment:
 
     def move_search_agent(self, searchagent_ID = -1, new_position = (-1, -1)):
         self.__searchagents[searchagent_ID] = new_position
-        print("Environment Update New Position", self.__searchagents[searchagent_ID])
-        print("All search agents:", self.__searchagents)
 
     def search_adjacent_tiles(self, x, y):
         """-------------------------------------------------------------------------------
