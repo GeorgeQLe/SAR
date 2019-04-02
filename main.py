@@ -3,7 +3,7 @@
 from sys import argv
 
 from areatype import AreaType
-from neuralnetwork import NeuralNetwork, NeuralNetworkInputs
+from neuralnetwork import NeuralNetwork
 from geneticalgorithm import GeneticAlgorithm, Simulation
 from searchagent import SearchAgent
 
@@ -25,13 +25,22 @@ def main():
 
     
 
-    ga = GeneticAlgorithm()
-    ga.run(1, 5, 80, OrderedDict((
-        (0, 11), (1, 15), (2, 24)
-    )))
+    # ga = GeneticAlgorithm()
+    # ga.run(1, 5, 80, OrderedDict((
+    #     (0, 11), (1, 15), (2, 24)
+    # )))
 
-    # print("Start Creating Neural Network")
-    # nn = NeuralNetwork()
+    print("Start Creating Neural Network")
+    nn = NeuralNetwork(
+        num_layers=3,
+        layers_info= {
+            0 : (9, 4),
+            1 : (4, 1)
+        },
+        num_weights=40
+    )
+    print("NN weights:", nn.get_weights())
+
     # nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
     # nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
     # nn.create_layer(index= 2, size= 9, last_layer= True)

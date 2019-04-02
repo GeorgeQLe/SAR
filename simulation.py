@@ -26,10 +26,8 @@ class Simulation:
             elif len(population) < num_search_agents:
                 difference_population = num_search_agents - len(population)
                 for i in range(difference_population):
-                    temp_nn = NeuralNetwork(num_layers= 3)
-                    temp_nn.create_layer(index= 0, size= 11, size_of_next_layer= 4)
-                    temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
-                    temp_nn.create_layer(index= 2, size= 9, last_layer= True)
+                    # Create neural network TODO
+                    
                     population.append(temp_nn)
         # creates a temp population in case there are neuron weights that need to plugged into 
         # neural networks in the population
@@ -38,11 +36,8 @@ class Simulation:
         # to neural networks so that they can be plugged into the search agents
         for nn in population:
             if not isinstance(nn, NeuralNetwork):
-                temp_nn = NeuralNetwork(num_layers=3)
-                temp_nn.create_layer(index= 0, size= 11, size_of_next_layer= 4)
-                temp_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
-                temp_nn.create_layer(index= 2, size= 9, last_layer= True)
-                temp_nn.override_weights(nn)
+                # Create neural network TODO
+                pass
             temp_population[population.index(nn)] = temp_nn
         population = temp_population
 

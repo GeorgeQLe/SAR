@@ -3,7 +3,7 @@
 import enum
 
 from environment import AdjacentTiles, Environment
-from neuralnetwork import NeuralNetwork, NeuralNetworkInputs
+from neuralnetwork import NeuralNetwork
 from tile import resolve_tiletype_as_float, TileTargetInfo, TileType
 
 from collections import OrderedDict
@@ -113,7 +113,9 @@ class SearchAgent:
         nn_inputs.append(float(self.__steps_taken)) 
         nn_inputs.append(float((environment.get_number_of_targets() - self.__targets_found)))
 
-        decision_list = self.__brain.evaluate(NeuralNetworkInputs(nn_inputs))
+        print(nn_inputs)
+        decision_list = self.__brain.evaluate(nn_inputs)
+        print(decision_list)
         decision = decision_list.index(max(decision_list))
         move_result = self.__move(direction=decision, environment=environment)
         if isinstance(move_result, TileTargetInfo):
