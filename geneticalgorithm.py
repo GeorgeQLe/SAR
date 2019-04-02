@@ -62,7 +62,8 @@ class GeneticAlgorithm:
         # creates the n number of neural networks that comprise the GA population
         for i in range(self.__number_of_individuals):
             # create neural network representation TODO
-            self.__population.append(temp_nn.get_weights())
+            
+            self.__population.append()
 
     def __replacement(self, parent1, parent2):
         worst_score = 0

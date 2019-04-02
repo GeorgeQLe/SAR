@@ -1,44 +1,74 @@
 # # Copyright 2019 George Le
 
 # from collections import OrderedDict
-# from math import exp
-# from random import uniform
+from math import exp
+from random import uniform
 
-class NeuralNetworkInputs:
-    def __init__(self, inputs = list()):
-        self.__inputs           = dict()
-        self.__num_layer_inputs = len(inputs)
-
-class NeuralNetworkWeights:
-    def __init__(self, num_weights = 0, weights = dict()):
-        self.__num_weights  = num_weights
-        self.__weights      = weights
-
-    def listify(self):
-        # turns the weights of the neural network into a list of the
-        # weights
-        return_weights = list()
-        for neuron_weights in self.__weights:
-            return_weights.extend(neuron_weights)
-        return return_weights
-
-    def update_weights(self, layers_sizes = dict(), weights = list()):
-        temp_weights = dict()
-        counter = 0
-        for weight in weights:
-            for layer_index in layers_sizes.keys():
-                if counter < layers_sizes[layer_index]:
-                    pass
+def sigmoid(input):
+    return (1.0 / (1.0 + exp(input * -1)))
 
 class NeuralNetwork:
-    
-    def __init__(self, inputs = list(), num_weights = 0, weights = dict()):
-        self.__inputs   = NeuralNetworkInputs(inputs)
-        self.__weights  = NeuralNetworkWeights(num_weights, weights)
-    
-    def evaluate(self, inputs = list()):
-        if len(inputs) > 0:
-            self.__inputs = NeuralNetworkInputs(inputs)
+    def __init__(self, bias = 0, num_layers = 0, layers_info = dict(), num_weights = 0, weights = list()):
+        if num_layers == 0:
+            return
+        if num_weights == 0:
+            return
+        if len(layers_size.keys()) != num_layers:
+            return
+
+        self.__bias                 = bias
+        self.__output               = 0
+        self.__layers_info          = layers_info # this is a dict that holds a key-value pair 
+                                                  # => (Key - layer index) : (Value - Tuple (number of neuron weights, number of neurons))
+        self.__num_layers           = num_layers
+        self.__num_weights          = num_weights
+        
+        temp_weights                = weights
+        if len(weights) == 0:
+            temp_weights.clear()
+            for i in range(self.__num_weights):
+                temp_weights.append(round(uniform(0.0, 1.0), 2))
+        self.__weights              = temp_weights
+
+    def __evaluate_neural_net_layer(self, layerNi = list(), weightsGi = list()):
+        if (len(layerNi) != len(weightsGi)):
+            return -1.0
+        else:
+            sum                     = 0
+            for j in range(len(layerNi)):
+                sum += (layerNi[j] * weightsGi[j])
+            return sigmoid(sum)
+
+    def evaluate(self, inputN1 = list()):
+        # tracks the current weights index
+        current_index       = 0
+        # tracks the outputs of a layer to be
+        # passed in as the input into the next layer
+        inputNi             = list()
+        # tracks the results of the neural network
+        # to be returned by this function
+        result              = 0
+        
+        # for each of the layers of the neural network
+        for layer_index in range(self.__num_layers):
+            # inputs to be passed into the new layer evalations
+            temp_inputs = inputNi
+            # clears the inputs container so that the inputs to the next layer
+            # can be stored
+            inputN1.clear()
+            # for each of the neurons of the neural network
+            for i in range(self.__layers_info[1]):
+                # create a temporary container for the neuron weights that will be
+                # used in the evaluation
+                GAi             = list()
+                # gather all of the neuron weights for a particular layer
+                for j in range(self.__layers_info[layer_index][0]):
+                    # grab the weight at the current weights counter index
+                    GAi.append(self.__weights[current_index])
+                    # move the weights counter along
+                    current_index+=1
+                # TODO
+                inputNi.append()
 
 # class NeuralNetworkInputs:
 #     """--------------------------------------------------------------------------
