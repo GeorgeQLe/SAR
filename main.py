@@ -23,8 +23,10 @@ def main():
     # simulation.setup_simulation(x=x, y=y, areatype=AreaType.woodlands, num_search_targets=1)
     # simulation.run_simulation(30)
 
+    
+
     ga = GeneticAlgorithm()
-    ga.run(1, 10, 80, OrderedDict((
+    ga.run(1, 5, 80, OrderedDict((
         (0, 11), (1, 15), (2, 24)
     )))
 
