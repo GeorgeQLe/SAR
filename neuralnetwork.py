@@ -44,7 +44,7 @@ class NeuralNetwork:
         current_index       = 0
         # tracks the outputs of a layer to be
         # passed in as the input into the next layer
-        inputNi             = list()
+        inputNi             = inputN1
         # tracks the results of the neural network
         # to be returned by this function
         result              = 0
@@ -67,8 +67,9 @@ class NeuralNetwork:
                     GAi.append(self.__weights[current_index])
                     # move the weights counter along
                     current_index+=1
-                # TODO
-                inputNi.append()
+                inputNi.append(self.__evaluate_neural_net_layer(inputNi, GAi))
+        result = inputNi[0]
+        return result
 
 # class NeuralNetworkInputs:
 #     """--------------------------------------------------------------------------
