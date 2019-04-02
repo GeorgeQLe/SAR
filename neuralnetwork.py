@@ -13,7 +13,7 @@ class NeuralNetwork:
             return
         if num_weights == 0:
             return
-        if len(layers_size.keys()) != num_layers:
+        if len(layers_info.keys()) != num_layers:
             return
 
         self.__bias                 = bias
