@@ -110,16 +110,14 @@ class SearchAgent:
         adj_list.append(float(self.__fuel_level))
 
         nn_inputs = adj_list
-        nn_inputs.append(float(self.__steps_taken))
+        nn_inputs.append(float(self.__steps_taken)) 
         nn_inputs.append(float((environment.get_number_of_targets() - self.__targets_found)))
 
         print(nn_inputs)
-        decision_list = self.__brain.evaluate()
+        decision_list = self.__brain.evaluate(nn_inputs)
         print(decision_list)
         decision = decision_list.index(max(decision_list))
-        print(decision)
         move_result = self.__move(direction=decision, environment=environment)
-        print(move_result)
         if isinstance(move_result, TileTargetInfo):
             if move_result == TileTargetInfo.falsepos:
                 self.__falsepos_list.append(self.__position)

@@ -13,7 +13,7 @@ class NeuralNetwork:
             return
         if num_weights == 0:
             return
-        if len(layers_info.keys()) != num_layers:
+        if len(layers_info.keys()) != num_layers - 1:
             return
 
         self.__bias                 = bias
@@ -52,7 +52,7 @@ class NeuralNetwork:
         # for each of the layers of the neural network
         for layer_index in range(self.__num_layers):
             # inputs to be passed into the new layer evalations
-            temp_inputs = inputNi
+            passed_inputs = inputNi
             # clears the inputs container so that the inputs to the next layer
             # can be stored
             inputN1.clear()
@@ -67,9 +67,13 @@ class NeuralNetwork:
                     GAi.append(self.__weights[current_index])
                     # move the weights counter along
                     current_index+=1
-                inputNi.append(self.__evaluate_neural_net_layer(inputNi, GAi))
+                inputNi.append(self.__evaluate_neural_net_layer(passed_inputs, GAi))
         result = inputNi[0]
+        
         return result
+
+    def get_weights(self):
+        return self.__weights
 
 # class NeuralNetworkInputs:
 #     """--------------------------------------------------------------------------

@@ -21,10 +21,12 @@ class GeneticAlgorithm:
 
     def __crossover(self, parent1, parent2):
         # single point crossover
-        for i in range(len(parent1)):
-            nn_weights1 = parent1
-            nn_weights2 = parent2
-            random_roll = randint(1, len(parent1))
+        for i in range(len(parent1.weights)):
+            if i == 0:
+                print("Parents1:", parent1.weights)
+            nn_weights1 = parent1.weights
+            nn_weights2 = parent2.weights
+            random_roll = randint(1, len(parent1.weights))
             nn_weights1[random_roll], nn_weights2[random_roll] = nn_weights2[random_roll], nn_weights1[random_roll]
         # two point crossover
         random_roll1 = randint(1, len(parent1) - 1)
@@ -58,7 +60,7 @@ class GeneticAlgorithm:
                 parent2.weights[random_roll_neuron] = mutator_list2
         self.__replacement(parent1, parent2)
 
-    def __generate_new_population(self, layers_size):
+    def __generate_new_population(self, layers_info, num_weights):
         # creates the n number of neural networks that comprise the GA population
         for i in range(self.__number_of_individuals):
             # create neural network representation TODO
@@ -124,9 +126,10 @@ class GeneticAlgorithm:
             self.__current_generation_num       += 1
             if self.__current_generation_num == 1:
                 # create a brand new population
-                self.__generate_new_population(layers_size)
+                self.__generate_new_population(layers_size, self.__number_of_individual_genes)
             self.__scores = self.__test_population()
-            print(self.__scores)
+            for weights in self.__population:
+                print(weights.weights)
             for i in range(10):
                 self.__selection()
         print("GA run complete")

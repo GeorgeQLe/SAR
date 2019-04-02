@@ -27,6 +27,7 @@ class Simulation:
                 difference_population = num_search_agents - len(population)
                 for i in range(difference_population):
                     # Create neural network TODO
+                    
                     population.append(temp_nn)
         # creates a temp population in case there are neuron weights that need to plugged into 
         # neural networks in the population
@@ -58,11 +59,6 @@ class Simulation:
             # self.__environment.draw()
         for i in range(len(self.__searchagents)):
             return_searchagents[ID] = grade(agent= self.__searchagents[i])
-            print(self.__searchagents[i].falsepos_found())
-            print(self.__searchagents[i].steps())
-            print(self.__searchagents[i].path_taken())
-            print(self.__searchagents[i].invalid_moves())
-            print("Grade for agent #", ID, ":", return_searchagents[ID])
         self.__environment.empty()
         return return_searchagents
 
