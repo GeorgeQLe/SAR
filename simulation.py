@@ -17,35 +17,18 @@ class Simulation:
         self.__environment.set_environment(x, y, areatype, num_search_targets)
         self.__environment.change_home_tile(0, 0)
 
-    def __setup_search_agents(self, num_search_agents = 1, population = list()):
-        if len(population) != num_search_agents:
-            if len(population) > num_search_agents:
-                difference_population = len(population) - num_search_agents
-                for i in range(difference_population):
-                    population.pop()
-            elif len(population) < num_search_agents:
-                difference_population = num_search_agents - len(population)
-                for i in range(difference_population):
-                    # Create neural network TODO
-                    
-                    population.append(temp_nn)
-        # creates a temp population in case there are neuron weights that need to plugged into 
-        # neural networks in the population
-        temp_population = population
-        # goes through the given population to make sure that all of the population are converted
-        # to neural networks so that they can be plugged into the search agents
-        for nn in population:
-            if not isinstance(nn, NeuralNetwork):
-                # Create neural network TODO
-                pass
-            temp_population[population.index(nn)] = temp_nn
-        population = temp_population
-
-        # for each of the search agents, plug in a neural network into it
-        for i in range(num_search_agents):
-            temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= i + 1)
-            temp.set_brain(population[i])
+    def __setup_search_agents(self, num_search_agents = 1, searchagents = list()):
+        self.__searchagents.clear()
+        if num_search_agents == 1:
+            temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= 1)
+            temp.set_brain(searchagents)
             self.__searchagents.append(temp)
+        else:
+            # for each of the search agents, plug in a neural network into it
+            for i in range(num_search_agents):
+                temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= i + 1)
+                temp.set_brain(searchagents[i])
+                self.__searchagents.append(temp)
         self.__environment.add_search_agents(num_search_agents)
 
     def run_simulation(self, num_of_turns = 300, ID = 1):

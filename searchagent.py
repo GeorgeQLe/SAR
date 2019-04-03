@@ -106,17 +106,13 @@ class SearchAgent:
 
     def __think(self, environment = Environment(), current_tiletype = TileType.void):
         adjacent_tiles = self.__get_adjacent_tiles(environment)
-        adj_list = adjacent_tiles.listify()
-        adj_list.append(float(self.__fuel_level))
-
-        nn_inputs = adj_list
-        nn_inputs.append(float(self.__steps_taken)) 
-        nn_inputs.append(float((environment.get_number_of_targets() - self.__targets_found)))
+        nn_inputs = adjacent_tiles.listify()
+        nn_inputs.append(float(self.__fuel_level))
 
         print(nn_inputs)
-        decision_list = self.__brain.evaluate(nn_inputs)
-        print(decision_list)
-        decision = decision_list.index(max(decision_list))
+        print(self.__brain.get_weights())
+        decision = int(round(self.__brain.evaluate(nn_inputs)))
+        print(decision)
         move_result = self.__move(direction=decision, environment=environment)
         if isinstance(move_result, TileTargetInfo):
             if move_result == TileTargetInfo.falsepos:
@@ -156,5 +152,8 @@ class SearchAgent:
         self.__turns_taken += 1
         return self.__think(environment)
 
-    def set_brain(self, new_brain = NeuralNetwork()):
-        self.__brain = new_brain
+    def set_brain(self, new_brain = list()):
+        self.__brain = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
+                                                            0 : (9, 4),
+                                                            1 : (4, 1)
+                                                            }), num_weights= 40, weights= new_brain)

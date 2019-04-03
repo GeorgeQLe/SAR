@@ -31,6 +31,7 @@ class NeuralNetwork:
         self.__weights              = temp_weights
 
     def __evaluate_neural_net_layer(self, layerNi = list(), weightsGi = list()):
+        print(len(layerNi), " ", len(weightsGi))
         if (len(layerNi) != len(weightsGi)):
             return -1.0
         else:
@@ -48,16 +49,15 @@ class NeuralNetwork:
         # tracks the results of the neural network
         # to be returned by this function
         result              = 0
-        
         # for each of the layers of the neural network
-        for layer_index in range(self.__num_layers):
+        for layer_index in range(self.__num_layers - 1):
             # inputs to be passed into the new layer evalations
-            passed_inputs = inputNi
+            passed_inputs = list(inputNi)
             # clears the inputs container so that the inputs to the next layer
             # can be stored
-            inputN1.clear()
+            inputNi.clear()
             # for each of the neurons of the neural network
-            for i in range(self.__layers_info[1]):
+            for i in range(self.__layers_info[layer_index][1]):
                 # create a temporary container for the neuron weights that will be
                 # used in the evaluation
                 GAi             = list()

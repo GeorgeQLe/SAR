@@ -25,18 +25,22 @@ def main():
 
     
 
-    # ga = GeneticAlgorithm()
-    # ga.run(1, 5, 80, OrderedDict((
-    #     (0, 11), (1, 15), (2, 24)
-    # )))
+    ga = GeneticAlgorithm()
+    ga.run(layers_info= dict({
+            0 : (9, 4),
+            1 : (4, 1)
+            }), 
+            num_generations= 1, 
+            number_of_individuals= 5, 
+            number_of_individual_genes= 40)
 
     print("Start Creating Neural Network")
     nn = NeuralNetwork(
         num_layers=3,
-        layers_info= {
+        layers_info= dict({
             0 : (9, 4),
             1 : (4, 1)
-        },
+        }),
         num_weights=40
     )
     print("NN weights:", nn.get_weights())
