@@ -27,7 +27,6 @@ class Simulation:
                 difference_population = num_search_agents - len(population)
                 for i in range(difference_population):
                     # Create neural network TODO
-                    
                     population.append(temp_nn)
         # creates a temp population in case there are neuron weights that need to plugged into 
         # neural networks in the population
