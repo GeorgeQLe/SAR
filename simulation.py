@@ -31,8 +31,8 @@ class Simulation:
                 self.__searchagents.append(temp)
         self.__environment.add_search_agents(num_search_agents)
 
-    def run_simulation(self, num_of_turns = 300, ID = 1):
-        return_searchagents = OrderedDict()
+    def run_simulation(self, num_of_turns = 300):
+        return_scores = list()
         self.__environment.generate(self.__frequency_falsepos)
 
         for i in range(num_of_turns):
@@ -41,9 +41,12 @@ class Simulation:
                 self.__environment.move_search_agent(searchagent_ID= self.__searchagents[j].get_ID(), new_position= self.__searchagents[j].turn(self.__environment))
             # self.__environment.draw()
         for i in range(len(self.__searchagents)):
-            return_searchagents[ID] = grade(agent= self.__searchagents[i])
+            return_scores.append(grade(agent= self.__searchagents[i]))
+
+        if len(self.__searchagents) == 1:
+            return_scores = return_scores[0]
         self.__environment.empty()
-        return return_searchagents
+        return return_scores
 
     def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
         self.__setup_test_environment(x, y, areatype, num_search_agents)

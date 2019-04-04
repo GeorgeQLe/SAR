@@ -25,55 +25,40 @@ def main():
 
     
 
-    ga = GeneticAlgorithm()
-    ga.run(layers_info= dict({
-            0 : (9, 4),
-            1 : (4, 1)
-            }), 
-            num_generations= 1, 
-            number_of_individuals= 5, 
-            number_of_individual_genes= 40)
-
-    print("Start Creating Neural Network")
-    nn = NeuralNetwork(
-        num_layers=3,
-        layers_info= dict({
-            0 : (9, 4),
-            1 : (4, 1)
-        }),
-        num_weights=40
-    )
-    print("NN weights:", nn.get_weights())
-
-    # nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
-    # nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
-    # nn.create_layer(index= 2, size= 9, last_layer= True)
+    # ga = GeneticAlgorithm()
+    # ga.run(layers_info= dict({
+    #         0 : (9, 4),
+    #         1 : (4, 1)
+    #         }), 
+    #         num_generations= 1, 
+    #         number_of_individuals= 5, 
+    #         number_of_individual_genes= 40)
     
-    # inputs = [ 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 ]
+    weights = list()
+    for i in range(40):
+        weights.append(round(uniform(0.0, 1.0), 2))
+    nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
+                                                            0 : (9, 4),
+                                                            1 : (4, 1)
+                                                            }), num_weights= 40, weights=weights)
+    
+    input = list()
+    for j in range(9):
+        input.append(round(uniform(0.0, 1), 2))
+    nn.evaluate(inputN1=input)
 
-    # print("Neural Network outputs:", nn.evaluate(inputs=NeuralNetworkInputs(inputs)))
-
-    # print("Neuron weights at neuron #", 13, ":", nn.search_neuron_weights_by_ID(13))
-
-    # nn_weights = nn.get_weights()
-    # print("All neuron weights: ")
-    # print(nn_weights.weights)
-    # for IDs in nn_weights.weights.keys():
-    #     print("Neuron", IDs, ":", nn_weights.weights[IDs])
-    # print("Layer size", nn_weights.layer_size)
-
-    # new_nn = NeuralNetwork()
-    # new_nn.create_layer(index= 0, size= 9, size_of_next_layer= 4)
-    # new_nn.create_layer(index= 1, size= 4, size_of_next_layer= 9)
-    # new_nn.create_layer(index= 2, size= 9, last_layer= True)
-
-    # new_nn.override_weights(nn_weights)
-
-    # new_weights = new_nn.get_weights()
-    # print("New neuron weights: ")
-    # print(new_weights.weights)
-    # for IDs in new_weights.weights.keys():
-    #     print("Neuron", IDs, ":", new_weights.weights[IDs])
+    # for i in range(10):
+    #     weights = list()
+    #     for i in range(40):
+    #         weights.append(round(uniform(0.0, 1), 2))
+    #     nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
+    #                                                             0 : (9, 4),
+    #                                                             1 : (4, 1)
+    #                                                             }), num_weights= 40, weights=weights)
+    #     input = list()
+    #     for j in range(9):
+    #         input.append(round(uniform(0.0, 1), 2))
+    #     nn.evaluate(inputN1= input)
     
 if __name__ == "__main__":
     main()

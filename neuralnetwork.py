@@ -5,6 +5,7 @@ from math import exp
 from random import uniform
 
 def sigmoid(input):
+    print("Sigmoid:", 1.0 / (1.0 + exp(input * -1)))
     return (1.0 / (1.0 + exp(input * -1)))
 
 class NeuralNetwork:
@@ -31,13 +32,13 @@ class NeuralNetwork:
         self.__weights              = temp_weights
 
     def __evaluate_neural_net_layer(self, layerNi = list(), weightsGi = list()):
-        print(len(layerNi), " ", len(weightsGi))
         if (len(layerNi) != len(weightsGi)):
             return -1.0
         else:
             sum                     = 0
             for j in range(len(layerNi)):
                 sum += (layerNi[j] * weightsGi[j])
+            print("Sum:", sum)
             return sigmoid(sum)
 
     def evaluate(self, inputN1 = list()):
@@ -68,6 +69,7 @@ class NeuralNetwork:
                     # move the weights counter along
                     current_index+=1
                 inputNi.append(self.__evaluate_neural_net_layer(passed_inputs, GAi))
+            print("InputNi after layer evaluation:", inputNi)
         result = inputNi[0]
         
         return result
