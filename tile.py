@@ -9,14 +9,14 @@ class TileTargetInfo(enum.IntEnum):
     falsepos    = 1
 
 class TileType(enum.IntEnum):
-    void        = -10
-    home        = -1
-    forest      = 10
-    mountain    = 20
-    plains      = 30
-    pond        = 40
-    river       = 50
-    swamp       = 60
+    void        = -1
+    home        = 0
+    forest      = 1
+    mountain    = 2
+    plains      = 3
+    pond        = 4
+    river       = 5
+    swamp       = 6
 
 def resolve_tiletype_as_float(tiletype = TileType.void):
     return float(tiletype)

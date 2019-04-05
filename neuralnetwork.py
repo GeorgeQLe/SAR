@@ -5,6 +5,7 @@ from math import exp
 from random import uniform
 
 def sigmoid(input):
+    print("Sigmoid:", 1.0 / (1.0 + exp(input * -1)))
     return (1.0 / (1.0 + exp(input * -1)))
 
 class NeuralNetwork:
@@ -37,6 +38,7 @@ class NeuralNetwork:
             sum                     = 0
             for j in range(len(layerNi)):
                 sum += (layerNi[j] * weightsGi[j])
+            print("Sum:", sum)
             return sigmoid(sum)
 
     def evaluate(self, inputN1 = list()):
@@ -48,16 +50,15 @@ class NeuralNetwork:
         # tracks the results of the neural network
         # to be returned by this function
         result              = 0
-        
         # for each of the layers of the neural network
-        for layer_index in range(self.__num_layers):
+        for layer_index in range(self.__num_layers - 1):
             # inputs to be passed into the new layer evalations
-            passed_inputs = inputNi
+            passed_inputs = list(inputNi)
             # clears the inputs container so that the inputs to the next layer
             # can be stored
-            inputN1.clear()
+            inputNi.clear()
             # for each of the neurons of the neural network
-            for i in range(self.__layers_info[1]):
+            for i in range(self.__layers_info[layer_index][1]):
                 # create a temporary container for the neuron weights that will be
                 # used in the evaluation
                 GAi             = list()
@@ -68,6 +69,7 @@ class NeuralNetwork:
                     # move the weights counter along
                     current_index+=1
                 inputNi.append(self.__evaluate_neural_net_layer(passed_inputs, GAi))
+            print("InputNi after layer evaluation:", inputNi)
         result = inputNi[0]
         
         return result

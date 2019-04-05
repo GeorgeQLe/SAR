@@ -7,6 +7,7 @@ from neuralnetwork import NeuralNetwork
 from tile import resolve_tiletype_as_float, TileTargetInfo, TileType
 
 from collections import OrderedDict
+from random import randint
 
 class Direction(enum.IntEnum):
     STAY    = 0
@@ -60,34 +61,51 @@ class SearchAgent:
                 print("Out of fuel")
                 return Move_Error.NOTENOUGHFUEL
         print("Old Position:", self.__position)
-        new_coord = tuple()
-        if direction == Direction.NW:
-            print("Move NW")
-            new_coord = (self.__position[0] - 1 , self.__position[1] + 1)
-        elif direction == Direction.N:
-            print("Move N")
-            new_coord = (self.__position[0], self.__position[1] + 1) 
-        elif direction == Direction.NE:
-            print("Move NE")
-            new_coord = (self.__position[0] + 1, self.__position[1] + 1)
-        elif direction == Direction.E:
-            print("Move E")
-            new_coord = (self.__position[0] + 1, self.__position[1]) 
-        elif direction == Direction.SE:
-            print("Move SE")
-            new_coord = (self.__position[0] + 1, self.__position[1] - 1)
-        elif direction == Direction.S:
-            print("Move S")
-            new_coord = (self.__position[0], self.__position[1] - 1)
-        elif direction == Direction.SW:
-            print("Move SW")
-            new_coord = (self.__position[0] - 1, self.__position[1] - 1)
-        elif direction == Direction.W:
-            print("Move W")
-            new_coord = (self.__position[0] + 1, self.__position[1])
-        elif direction == Direction.STAY:
-            print("Stay")
-            new_coord = (self.__position[0], self.__position[1])
+        new_coord       = tuple()
+        
+        direction_nine  = True
+        while direction_nine:
+            print(direction)
+            if direction == Direction.NW:
+                print("Move NW")
+                new_coord = (self.__position[0] - 1 , self.__position[1] + 1)
+                direction_nine = False
+            elif direction == Direction.N:
+                print("Move N")
+                new_coord = (self.__position[0], self.__position[1] + 1)
+                direction_nine = False
+            elif direction == Direction.NE:
+                print("Move NE")
+                new_coord = (self.__position[0] + 1, self.__position[1] + 1)
+                direction_nine = False
+            elif direction == Direction.E:
+                print("Move E")
+                new_coord = (self.__position[0] + 1, self.__position[1])
+                direction_nine = False
+            elif direction == Direction.SE:
+                print("Move SE")
+                new_coord = (self.__position[0] + 1, self.__position[1] - 1)
+                direction_nine = False
+            elif direction == Direction.S:
+                print("Move S")
+                new_coord = (self.__position[0], self.__position[1] - 1)
+                direction_nine = False
+            elif direction == Direction.SW:
+                print("Move SW")
+                new_coord = (self.__position[0] - 1, self.__position[1] - 1)
+                direction_nine = False
+            elif direction == Direction.W:
+                print("Move W")
+                new_coord = (self.__position[0] + 1, self.__position[1])
+                direction_nine = False
+            elif direction == Direction.STAY:
+                print("Stay")
+                new_coord = (self.__position[0], self.__position[1])
+                direction_nine = False
+            elif direction == 9 or direction == 10:
+                print("Random movement")
+                direction = randint(0, 8)
+        print(new_coord)
         # checks to make sure that the new coordinates are actually in the environment
         if environment.check_tile(new_coord[0], new_coord[1]) == False:
             print("Out of bounds")
@@ -106,17 +124,12 @@ class SearchAgent:
 
     def __think(self, environment = Environment(), current_tiletype = TileType.void):
         adjacent_tiles = self.__get_adjacent_tiles(environment)
-        adj_list = adjacent_tiles.listify()
-        adj_list.append(float(self.__fuel_level))
+        nn_inputs = adjacent_tiles.listify()
+        nn_inputs.append(float(self.__fuel_level))
 
-        nn_inputs = adj_list
-        nn_inputs.append(float(self.__steps_taken)) 
-        nn_inputs.append(float((environment.get_number_of_targets() - self.__targets_found)))
+        decision = self.__brain.evaluate(nn_inputs)
+        decision = int(round(decision, 1) * 10)
 
-        print(nn_inputs)
-        decision_list = self.__brain.evaluate(nn_inputs)
-        print(decision_list)
-        decision = decision_list.index(max(decision_list))
         move_result = self.__move(direction=decision, environment=environment)
         if isinstance(move_result, TileTargetInfo):
             if move_result == TileTargetInfo.falsepos:
@@ -156,5 +169,8 @@ class SearchAgent:
         self.__turns_taken += 1
         return self.__think(environment)
 
-    def set_brain(self, new_brain = NeuralNetwork()):
-        self.__brain = new_brain
+    def set_brain(self, new_brain = list()):
+        self.__brain = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
+                                                            0 : (9, 4),
+                                                            1 : (4, 1)
+                                                            }), num_weights= 40, weights= new_brain)
