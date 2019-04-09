@@ -8,6 +8,7 @@ from geneticalgorithm import GeneticAlgorithm, Simulation
 from searchagent import SearchAgent
 
 from collections import OrderedDict
+from math import exp
 from random import randint, uniform
 
 def main():
@@ -34,31 +35,26 @@ def main():
     #         number_of_individuals= 5, 
     #         number_of_individual_genes= 40)
     
+#     value = -2
+#     add_value = 0.1
+#     while value < 2.3:
+#         print("Input:", value, "Output:", round(sigmoid(value), 4))
+#         value+=add_value
+
+# def sigmoid(input):
+#     return 1.0 / (1.0 + exp(input * -1))
+
     weights = list()
     for i in range(40):
-        weights.append(round(uniform(0.0, 1.0), 2))
+        weights.append(round(uniform(-2, 2.3), 4))
     nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
                                                             0 : (9, 4),
                                                             1 : (4, 1)
                                                             }), num_weights= 40, weights=weights)
-    
     input = list()
     for j in range(9):
-        input.append(round(uniform(0.0, 1), 2))
-    nn.evaluate(inputN1=input)
-
-    # for i in range(10):
-    #     weights = list()
-    #     for i in range(40):
-    #         weights.append(round(uniform(0.0, 1), 2))
-    #     nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
-    #                                                             0 : (9, 4),
-    #                                                             1 : (4, 1)
-    #                                                             }), num_weights= 40, weights=weights)
-    #     input = list()
-    #     for j in range(9):
-    #         input.append(round(uniform(0.0, 1), 2))
-    #     nn.evaluate(inputN1= input)
+        input.append(round(uniform(-2, 2.3), 2))
+    nn.evaluate(inputN1= input)
     
 if __name__ == "__main__":
     main()

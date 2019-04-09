@@ -21,6 +21,61 @@ class GeneticAlgorithm:
         self.__scores                       = list() # this is a list of scores of the population, the index of the score should correspond to the index
                                                      # of the scored individual in the population list
 
+    def __generate_new_population(self, layers_info):
+        # creates the n number of neural networks that comprise the GA population
+        for i in range(self.__number_of_individuals):
+            individual = list()
+            # create neural network representation
+            for j in range(self.__number_of_individual_genes):
+                individual.append(round(uniform(0.0, 1.0), 2))
+            self.__population.append(individual)
+            
+    def __selection(self):
+        parents = list()
+        # to select two parents
+        parents = self.__tournament_pool()
+        print("Before crossover")
+        print("Parent1:", parents[0])
+        print("Parent2:", parents[1])
+        self.__crossover(parents[0], parents[1])
+        print("After crossover")
+        print("Parent1:", parents[0])
+        print("Parent2:", parents[1])
+        # replace the winners of the tournament pool if they are better than the existing population
+        self.__replacement(parents[0], parents[1])
+
+    def __tournament_pool(self):
+        # determine if there will be a mutation at all
+        random_roll     = randint(1, 100)
+        # stores the best from the first selection from the population
+        stored_best     = list()
+
+        # selected parents for the replacement
+        parents  = list()
+
+        # mutation rate
+        if random_roll < self.__mutation_rate:
+            # selecting individuals from the population
+            tp_indexes        = list()
+            while len(tp_indexes) != 4:
+                random_roll = randint(0, len(self.__population) - 1)
+                if random_roll not in tp_indexes:
+                    tp_indexes.append(random_roll)
+            while len(parents) != 2:
+                best_score          = self.__scores[0]
+                best_score_index    = 0
+                for index in tp_indexes:
+                    if self.__scores[index] > best_score and self.__scores[index] not in stored_best:
+                        best_score          = self.__scores[index]
+                        best_score_index    = index
+                # add the selected two best parents
+                parents.append(self.__population[best_score_index])
+                stored_best.append(best_score)
+
+            parents[0] = self.__mutation(parents[0])
+            parents[1] = self.__mutation(parents[1])
+        return parents
+
     def __crossover(self, parent1 = list(), parent2 = list()):
         # print("Before single point crossover")
         # print("Parent1:", parent1)
@@ -36,14 +91,28 @@ class GeneticAlgorithm:
         # print("Parent1:", parent1)
         # print("Parent2:", parent2)
 
-    def __generate_new_population(self, layers_info):
-        # creates the n number of neural networks that comprise the GA population
-        for i in range(self.__number_of_individuals):
-            individual = list()
-            # create neural network representation
-            for j in range(self.__number_of_individual_genes):
-                individual.append(round(uniform(0.0, 1.0), 2))
-            self.__population.append(individual)
+    def __singlepoint_crossover(self, parent1 = list(), parent2 = list()):
+        random_rolls = list()
+        for i in range(len(parent1)):
+            nn_weights1 = parent1
+            nn_weights2 = parent2
+            random_roll = randint(0, len(parent1) - 1)
+            nn_weights1[random_roll], nn_weights2[random_roll] = nn_weights2[random_roll], nn_weights1[random_roll]
+            random_rolls.append(random_roll)
+        return random_rolls
+
+    def __twopoint_crossover(self, parent1 = list(), parent2 = list()):
+        random_roll1 = randint(0, len(parent1) - 1)
+        random_roll2 = randint(random_roll1, len(parent2) - 1)
+        index       = random_roll1
+        nn_weights1 = parent1
+        nn_weights2 = parent2
+        while index < random_roll2:
+            nn_weights1[index], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
+            index += 1
+        parent1 = nn_weights1
+        parent2 = nn_weights2
+        return tuple((random_roll1, random_roll2))
 
     def __mutation(self, individual):
         random_roll                 = randint(0, len(individual) - 1)
@@ -89,80 +158,6 @@ class GeneticAlgorithm:
             print("Improvement!!!!!!!!!")
             self.__population[second_index - 1] = parent2
             self.__population[worst_index - 1] = parent1
-        
-    def __selection(self):
-        parents = list()
-        exclusion_list = list()
-        # to select two parents
-        while len(parents) != 2:
-            random_roll = randint(0, len(self.__population) - 1)
-            if random_roll not in exclusion_list:
-                parents.append(self.__population[random_roll])
-                exclusion_list.append(random_roll)
-        print("Before crossover")
-        print("Parent1:", parents[0])
-        print("Parent2:", parents[1])
-        self.__crossover(parents[0], parents[1])
-        print("After crossover")
-        print("Parent1:", parents[0])
-        print("Parent2:", parents[1])
-        return parents
-
-    def __singlepoint_crossover(self, parent1 = list(), parent2 = list()):
-        random_rolls = list()
-        for i in range(len(parent1)):
-            nn_weights1 = parent1
-            nn_weights2 = parent2
-            random_roll = randint(0, len(parent1) - 1)
-            nn_weights1[random_roll], nn_weights2[random_roll] = nn_weights2[random_roll], nn_weights1[random_roll]
-            random_rolls.append(random_roll)
-        return random_rolls
-
-    def __tournament_pool(self):
-        # determine if there will be a mutation at all
-        random_roll     = randint(1, 100)
-        # stores the best from the first selection from the population
-        stored_best     = list()
-
-        # selected parents for the replacement
-        parents  = list()
-
-        # mutation rate
-        if random_roll < self.__mutation_rate:
-            # selecting individuals from the population
-            tp_indexes        = list()
-            while len(tp_indexes) != 4:
-                random_roll = randint(0, len(self.__population) - 1)
-                if random_roll not in tp_indexes:
-                    tp_indexes.append(random_roll)
-            while len(parents) != 2:
-                best_score          = self.__scores[0]
-                best_score_index    = 0
-                for index in tp_indexes:
-                    if self.__scores[index] > best_score and self.__scores[index] not in stored_best:
-                        best_score          = self.__scores[index]
-                        best_score_index    = index
-                # add the selected two best parents
-                parents.append(self.__population[best_score_index])
-                stored_best.append(best_score)
-
-            parents[0] = self.__mutation(parents[0])
-            parents[1] = self.__mutation(parents[1])
-            # replace the winners of the tournament pool if they are better than the existing population
-            self.__replacement(parents[0], parents[1])
-
-    def __twopoint_crossover(self, parent1 = list(), parent2 = list()):
-        random_roll1 = randint(0, len(parent1) - 1)
-        random_roll2 = randint(random_roll1, len(parent2) - 1)
-        index       = random_roll1
-        nn_weights1 = parent1
-        nn_weights2 = parent2
-        while index < random_roll2:
-            nn_weights1[index], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
-            index += 1
-        parent1 = nn_weights1
-        parent2 = nn_weights2
-        return tuple((random_roll1, random_roll2))
 
     def __test_population(self):
         counter = 1
@@ -194,8 +189,9 @@ class GeneticAlgorithm:
 
             # for i in range(10):
             self.__selection()
-            # tournament pool
-            self.__tournament_pool()
+
+            # record the most recent population into the history of the genetic algorithm
+            self.__old_populations[self.__current_generation_num] = self.__population
         for i in range(len(self.__population)):
             print(self.__population[i])
         print("GA run complete")
