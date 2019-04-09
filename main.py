@@ -26,14 +26,14 @@ def main():
 
     
 
-    # ga = GeneticAlgorithm()
-    # ga.run(layers_info= dict({
-    #         0 : (9, 4),
-    #         1 : (4, 1)
-    #         }), 
-    #         num_generations= 1, 
-    #         number_of_individuals= 5, 
-    #         number_of_individual_genes= 40)
+    ga = GeneticAlgorithm()
+    ga.run(layers_info= dict({
+            0 : (9, 5),
+            1 : (5, 1)
+            }), 
+            num_generations= 1, 
+            number_of_individuals= 5, 
+            number_of_individual_genes= 50)
     
 #     value = -2
 #     add_value = 0.1

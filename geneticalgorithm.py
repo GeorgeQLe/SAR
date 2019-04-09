@@ -27,7 +27,7 @@ class GeneticAlgorithm:
             individual = list()
             # create neural network representation
             for j in range(self.__number_of_individual_genes):
-                individual.append(round(uniform(0.0, 1.0), 2))
+                individual.append(round(uniform(0.0, 1.0), 4))
             self.__population.append(individual)
             
     def __selection(self):
@@ -182,12 +182,14 @@ class GeneticAlgorithm:
             if self.__current_generation_num == 1:
                 # create a brand new population
                 self.__generate_new_population(layers_info)
+                for i in range(len(self.__population)):
+                    print(self.__population[i])
             self.__scores = self.__test_population()
             for i in range(len(self.__population)):
                 print(self.__population[i])
                 print(self.__scores[i])
 
-            # for i in range(10):
+        #     for i in range(10):
             self.__selection()
 
             # record the most recent population into the history of the genetic algorithm
