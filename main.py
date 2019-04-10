@@ -1,61 +1,45 @@
 # Copyright 2019 George Le
-
 from sys import argv
 
-from areatype import AreaType
-from neuralnetwork import NeuralNetwork
-from geneticalgorithm import GeneticAlgorithm, Simulation
+from file import valid_directory, add_endslash
+from geneticalgorithm import GeneticAlgorithm
 from searchagent import SearchAgent
 
-from collections import OrderedDict
-from math import exp
-from random import randint, uniform
-
 def main():
-    x = 30
-    y = 30
+    debug = "NONE"
+    path = "./Dumps"
+    if len(argv) > 1:
+        debug = argv[1] # the first command line argument should be whether or not the 
+                        # user wishes to have the program output helpful debug text to
+                        # the files designated in debug_output_files.txt
+        if debug != "NONE" and debug != "ALL":
+            print("ERROR: first argument should be a choice about the debug!")
+        path = argv[2]
+        if not valid_directory(path):
+            print("ERROR:", path, "is not a valid path!")
 
-    # if len(argv) > 1:
-    #     if len(argv) == 3:
-    #         x = int(argv[1])
-    #         y = int(argv[2])
+    if valid_directory(path, "test.txt"):
+        print("Is valid directory")
+    else:
+        print("Is not a valid directory")
 
-    # simulation = Simulation()
-    # simulation.setup_simulation(x=x, y=y, areatype=AreaType.woodlands, num_search_targets=1)
-    # simulation.run_simulation(30)
+    print(path)
+    path = add_endslash(path)
+    print(path)
 
-    
+    if valid_directory(path, "test.txt"):
+        print("Is valid directory")
+    else:
+        print("Is not a valid directory")
 
-    ga = GeneticAlgorithm()
-    ga.run(layers_info= dict({
-            0 : (9, 5),
-            1 : (5, 1)
-            }), 
-            num_generations= 1, 
-            number_of_individuals= 5, 
-            number_of_individual_genes= 50)
-    
-#     value = -2
-#     add_value = 0.1
-#     while value < 2.3:
-#         print("Input:", value, "Output:", round(sigmoid(value), 4))
-#         value+=add_value
+    # ga = GeneticAlgorithm()
+    # ga.run(layers_info= dict({
+    #         0 : (9, 5),
+    #         1 : (5, 1)
+    #         }), 
+    #         num_generations= 1, 
+    #         number_of_individuals= 5, 
+    #         number_of_individual_genes= 50)
 
-# def sigmoid(input):
-#     return 1.0 / (1.0 + exp(input * -1))
-
-    # for i in range(5):
-    #     weights = list()
-    #     for i in range(40):
-    #         weights.append(round(uniform(-2, 2.3), 4))
-    #     nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
-    #                                                             0 : (9, 4),
-    #                                                             1 : (4, 1)
-    #                                                             }), num_weights= 40, weights=weights)
-    #     input = list()
-    #     for j in range(9):
-    #         input.append(round(uniform(-2, 2.3), 2))
-    #     nn.evaluate(inputN1= input)
-    
 if __name__ == "__main__":
     main()
