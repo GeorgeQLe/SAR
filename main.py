@@ -44,17 +44,18 @@ def main():
 # def sigmoid(input):
 #     return 1.0 / (1.0 + exp(input * -1))
 
-    weights = list()
-    for i in range(40):
-        weights.append(round(uniform(-2, 2.3), 4))
-    nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
-                                                            0 : (9, 4),
-                                                            1 : (4, 1)
-                                                            }), num_weights= 40, weights=weights)
-    input = list()
-    for j in range(9):
-        input.append(round(uniform(-2, 2.3), 2))
-    nn.evaluate(inputN1= input)
+    # for i in range(5):
+    #     weights = list()
+    #     for i in range(40):
+    #         weights.append(round(uniform(-2, 2.3), 4))
+    #     nn = NeuralNetwork(bias=0, num_layers=3, layers_info=dict({
+    #                                                             0 : (9, 4),
+    #                                                             1 : (4, 1)
+    #                                                             }), num_weights= 40, weights=weights)
+    #     input = list()
+    #     for j in range(9):
+    #         input.append(round(uniform(-2, 2.3), 2))
+    #     nn.evaluate(inputN1= input)
     
 if __name__ == "__main__":
     main()
