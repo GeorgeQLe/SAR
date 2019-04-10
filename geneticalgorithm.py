@@ -1,7 +1,7 @@
 # Copyright 2019 George Le
 
 from neuralnetwork import NeuralNetwork
-from simulation import AreaType, SearchAgent, Simulation
+from tester import test_individual, test_group
 
 from collections import OrderedDict
 from random import randint, uniform
@@ -12,7 +12,9 @@ class GeneticAlgorithm:
 
     def __init__(self):
         self.__current_generation_num       = 0
-        self.__mutation_rate                = 5 # the rate in which random mutations happen in the GA, default is 5%
+        self.__mutation_rate_single_point   = 50 # the rate in which single point crossover happens in the GA, default is 50%
+        self.__mutation_rate_two_point      = 75 # the rate in which two point crossover happens in the GA, default is 75%
+        self.__mutation_rate                = 5 # the rate in which a fixed point mutation occurs in the GA, default is 5%
         self.__number_of_generations        = 0 # number of generations that the genetic algorithm will run through
         self.__number_of_individual_genes   = 0 # number of genes that belong to an individual
         self.__number_of_individuals        = 0 # number of individuals in each generations
@@ -128,11 +130,8 @@ class GeneticAlgorithm:
         individual[random_roll] = round(uniform(-2, 2.3), 4)
 
     def __replacement(self, parent1, parent2):
-        simulation  = Simulation()
-        simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, parent1)
-        score1      = simulation.run_simulation(30)
-        simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, parent2)
-        score2      = simulation.run_simulation(30)
+        score1      = test_individual(parent1)
+        score2      = test_individual(parent2)
 
         # designate parent 1 as the worst if parent1 is not worst than parent2
         # then swap the two parents
@@ -151,21 +150,8 @@ class GeneticAlgorithm:
         # get index of element that is min
         # swap min if score of parent is greater than min
         # repeat for second parentS
+        
 
-
-        for index in range(len(self.__scores)):
-            prev_second_worst = second_worst
-            prev_second_worst_index = second_index
-            if self.__scores[index] < second_worst:
-                second_worst = self.__scores[index]
-                second_index = index
-            if self.__scores[index] < worst_score:
-                worst_score = self.__scores[index]
-                worst_index = index
-
-                second_worst = prev_second_worst
-                second_index = prev_second_worst_index
-            index += 1
         # if the two new parents' scores are higher than the two worst of
         # the current population then replace them
         if score2 > second_worst and score1 > worst_score:
@@ -176,17 +162,9 @@ class GeneticAlgorithm:
             self.__scores[second_index - 1] = score1
 
     def __test_population(self):
-        counter = 1
-        return_scores = list()
-        
-        # for each individual of the population, perform a run of the simulation
-        for individual in self.__population:
-            simulation = Simulation()
-            simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, individual)
-            return_scores.append(simulation.run_simulation(30))
-            print("Simulation number:", counter, "complete")
-            counter += 1
-        return return_scores
+        # test the current population and return the resulting scores
+        # test_group function found in tester.py
+        return test_group(self.__population)
 
     def run(self, layers_info, num_generations, number_of_individuals, number_of_individual_genes):
         self.__number_of_generations        = num_generations
