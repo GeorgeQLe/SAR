@@ -11,7 +11,7 @@ from operator import itemgetter
 class GeneticAlgorithm:
 
     def __init__(self):
-        self.__current_generation_num       = 0
+        self.__current_generation_num       = 0 # tracks the current generation that the GA is running through
         self.__mutation_rate                = 5 # the rate in which random mutations happen in the GA, default is 5%
         self.__number_of_generations        = 0 # number of generations that the genetic algorithm will run through
         self.__number_of_individual_genes   = 0 # number of genes that belong to an individual
@@ -207,9 +207,6 @@ class GeneticAlgorithm:
 
             self.__selection()
 
-        #     # record the most recent population into the history of the genetic algorithm
-        #     self.__old_populations[self.__current_generation_num] = self.__population
-        # for i in range(len(self.__population)):
-        #     print(self.__population[i])
-        #     print(self.__scores[i])
+            # record the most recent population into the history of the genetic algorithm
+            self.__old_populations[self.__current_generation_num] = self.__population
         print("GA run complete")
