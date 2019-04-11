@@ -76,19 +76,18 @@ class GeneticAlgorithm:
         # selected parents for the replacement
         parents  = list()
 
-        # selecting individuals from the population
-        tp_indexes        = list()
-        while len(tp_indexes) != 4:
-            random_roll = randint(0, len(self.__population) - 1)
-            if random_roll not in tp_indexes:
-                tp_indexes.append(random_roll)
+        
+        # selects 2 parents out of the four
         while len(parents) != 2:
-            best_score          = self.__scores[0]
-            best_score_index    = 0
-            for index in tp_indexes:
-                if self.__scores[index] > best_score and index not in stored_best:
-                    best_score          = self.__scores[index]
-                    best_score_index    = index
+            # selecting individuals from the population
+            tp_indexes        = list()
+            while len(tp_indexes) != 4:
+                random_roll = randint(0, len(self.__population) - 1)
+                if random_roll not in tp_indexes and random_roll not in stored_best:
+                    tp_indexes.append(random_roll)
+
+            best_score          = max(tp_indexes)
+            best_score_index    = tp_indexes.index(best_score)
             # add the selected two best parents
             parents.append(self.__population[best_score_index])
             stored_best.append(best_score_index)
