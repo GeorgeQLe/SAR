@@ -36,7 +36,7 @@ class Simulation:
         self.__environment.generate(self.__frequency_falsepos)
 
         for i in range(num_of_turns):
-            print("Turn", i + 1)
+            # print("Turn", i + 1)
             for j in range(len(self.__searchagents)):
                 self.__environment.move_search_agent(searchagent_ID= self.__searchagents[j].get_ID(), new_position= self.__searchagents[j].turn(self.__environment))
             # self.__environment.draw()

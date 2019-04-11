@@ -1,5 +1,6 @@
 # Copyright 2019 George Le
 
+from file import write_to_file
 from neuralnetwork import NeuralNetwork
 from tester import test_individual, test_group
 
@@ -10,18 +11,26 @@ from operator import itemgetter
 
 class GeneticAlgorithm:
 
-    def __init__(self):
-        self.__current_generation_num       = 0 # a counter which tracks the current generation that the GA is running
-        self.__mutation_rate_single_point   = 50 # the rate in which single point crossover happens in the GA, default is 50%
-        self.__mutation_rate_two_point      = 75 # the rate in which two point crossover happens in the GA, default is 75%
-        self.__mutation_rate                = 5 # the rate in which a fixed point mutation occurs in the GA, default is 5%
+    def __init__(self, debug = True, path_filename = "./Dumps/GA.txt"):
+        # genetic algorithm settings
+        self.__debug                        = debug # 
+        self.__path_filename                = "./Dumps/GA.txt" # by default the output of the GA is put in the Dumps directory in GA.txt
+
         self.__number_of_generations        = 0 # number of generations that the genetic algorithm will run through
         self.__number_of_individual_genes   = 0 # number of genes that belong to an individual
         self.__number_of_individuals        = 0 # number of individuals in each generations
-        self.__old_populations              = { int : list() } # this is a dict holding a key-value pair (population index (int) : list(Neural Network Weights)) 
+
+        # information for when the genetic algorithm runs 
+        self.__current_generation_num       = 0 # a counter which tracks the current generation that the GA is running
+        self.__old_populations              = dict() # this is a dict holding a key-value pair (population index (int) : list(Neural Network Weights)) 
         self.__population                   = list() # this is a list holding the GA's current population
         self.__scores                       = list() # this is a list of scores of the population, the index of the score should correspond to the index
                                                      # of the scored individual in the population list
+
+        # mutation settings
+        self.__mutation_rate_single_point   = 50 # the rate in which single point crossover happens in the GA, default is 50%
+        self.__mutation_rate_two_point      = 75 # the rate in which two point crossover happens in the GA, default is 75%
+        self.__mutation_rate                = 5 # the rate in which a fixed point mutation occurs in the GA, default is 5%
 
     def __generate_new_population(self, layers_info):
         # creates the n number of neural networks that comprise the GA population
@@ -33,26 +42,28 @@ class GeneticAlgorithm:
             self.__population.append(individual)
             
     def __selection(self):
+        # initialize the container for the two parents
         parents = list()
-        # to select two parents
-
-        # TODO ADD PROBABILITIES WITH MUTATION RATE FOR ALL GA OPERATIONS
-        print("Selection")
+        # uses a tournament pool to select two parents
+        print("SELECTION")
         parents = self.__tournament_pool()
-        print(parents)
-        print("Before crossover")
-        print("Parent1:", parents[0])
-        print("Parent2:", parents[1])
-        self.__crossover(parents[0], parents[1])
-        print("After crossover")
-        print("Parent1:", parents[0])
-        print("Parent2:", parents[1])
 
-        self.__mutation(parents[0])
-        self.__mutation(parents[1])
-        print("After mutation")
-        print("Parent1:", parents[0])
-        print("Parent2:", parents[1])
+        print("PARENTS BEFORE CROSSOVER")
+        print("Parents 1", parents[0])
+        print("Parents 2", parents[1])
+        self.__crossover(parents[0], parents[1])
+
+        random_roll = randint(1, 100)
+        if random_roll > self.__mutation_rate:
+            self.__mutation(parents[0])
+            print("After mutation")
+            print("Parent1:", parents[0])
+        random_roll = randint(1, 100)
+        if random_roll > self.__mutation_rate:
+            self.__mutation(parents[1])
+            print("After mutation")
+            print("Parent2:", parents[1])
+
         # replace the winners of the tournament pool if they are better than the existing population
         self.__replacement(parents[0], parents[1])
 
@@ -75,28 +86,35 @@ class GeneticAlgorithm:
             best_score          = self.__scores[0]
             best_score_index    = 0
             for index in tp_indexes:
-                if self.__scores[index] > best_score and self.__scores[index] not in stored_best:
+                if self.__scores[index] > best_score and index not in stored_best:
                     best_score          = self.__scores[index]
                     best_score_index    = index
             # add the selected two best parents
             parents.append(self.__population[best_score_index])
-            stored_best.append(best_score)
+            stored_best.append(best_score_index)
+        print("Selected parents at indexes:", stored_best)
         return parents
 
     def __crossover(self, parent1 = list(), parent2 = list()):
-        print("Before single point crossover")
-        print("Parent1:", parent1)
-        print("Parent2:", parent2)
+        print("Before crossover")
+        print("Parent 1:", parent1)
+        print("Parent 2:", parent2)
         # single point crossover
-        self.__singlepoint_crossover(parent1, parent2)
-        print("Before two point crossover")
-        print("Parent1:", parent1)
-        print("Parent2:", parent2)
+        random_roll = randint(1, 100)
+        if random_roll > self.__mutation_rate_single_point:
+            print("Does single point")
+            self.__singlepoint_crossover(parent1, parent2)
+            print("Before two point crossover")
+            print("Parent 1:", parent1)
+            print("Parent 2:", parent2)
         # two point crossover
-        self.__twopoint_crossover(parent1, parent2)
-        print("After crossover")
-        print("Parent1:", parent1)
-        print("Parent2:", parent2)
+        random_roll = randint(1, 100)
+        if random_roll > self.__mutation_rate_two_point:
+            print("Does two point")
+            self.__twopoint_crossover(parent1, parent2)
+            print("After crossover")
+            print("Parent 1:", parent1)
+            print("Parent 2:", parent2)
 
     def __singlepoint_crossover(self, parent1 = list(), parent2 = list()):
         random_roll = randint(0, len(parent1) - 1)
@@ -115,8 +133,8 @@ class GeneticAlgorithm:
         index       = random_roll1
         nn_weights1 = parent1
         nn_weights2 = parent2
-        print("Random roll1:", random_roll1)
-        print("Random roll2:", random_roll2)
+        print("Random roll 1:", random_roll1)
+        print("Random roll 2:", random_roll2)
         while index < random_roll2:
             nn_weights1[index ], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
             index += 1
@@ -140,26 +158,36 @@ class GeneticAlgorithm:
             parent1 = parent2
             parent2 = temp_parent 
 
-        # determine the two worst scores of the existing population
-        worst_score     = 0
-        second_worst    = 0
-        worst_index     = len(self.__population) - 1
-        second_index    = len(self.__population) - 1
-
         # get min of scores array
         # get index of element that is min
         # swap min if score of parent is greater than min
-        # repeat for second parentS
-        
+        # repeat for second parent
+        min_score = min(self.__scores)
+        min_index = self.__scores.index(min_score)
+        if score1 > min_score:
+            print("Replace parent 1 with individual", min_index + 1)
+            print("Individual to be replaced:", self.__population[min_index])
+            print("Parent 1:", parent1)
+            self.__population[min_index] = parent1
+            print("New Individual:", self.__population[min_index])
+            self.__scores[min_index] = score1
 
-        # if the two new parents' scores are higher than the two worst of
-        # the current population then replace them
-        if score2 > second_worst and score1 > worst_score:
-            print("Improvement!!!!!!!!!")
-            self.__population[second_index - 1] = parent2
-            self.__scores[second_index - 1] = score2
-            self.__population[worst_index - 1] = parent1
-            self.__scores[second_index - 1] = score1
+        previous_min_index = min_index
+        min_score = min(self.__scores)
+        min_index = self.__scores.index(min_score)
+        
+        # if min_index == previous_min_index:
+        #     i = 0
+        #     while i < len(self.__scores):
+        #         pass
+
+        if score2 > min_score:
+            print("Replace parent 2 with individual", min_index + 1)
+            print("Individual to be replaced:", self.__population[min_index])
+            print("Parent 2", parent2)
+            self.__population[min_index] = parent2
+            print("New Individual:", self.__population[min_index])
+            self.__scores[min_index] = score2
 
     def __test_population(self):
         # test the current population and return the resulting scores
@@ -173,18 +201,41 @@ class GeneticAlgorithm:
 
         while self.__current_generation_num < self.__number_of_generations:
             self.__current_generation_num       += 1
+            print("START GENERATION", self.__current_generation_num)
+            print()
+            if len(self.__population) > 0:
+                for i in range(len(self.__population)):
+                    print("Genes of individual", i + 1, ":", self.__population[i])
+                    print("Score for individual", i + 1, ":", self.__scores[i])
+                print()
             if self.__current_generation_num == 1:
                 # create a brand new population
+                print("GENERATE NEW POPULATION")
+                print()
                 self.__generate_new_population(layers_info)
                 for i in range(len(self.__population)):
-                    print(self.__population[i])
+                    print("Genes of individual", i + 1, ":", self.__population[i])
+                print()
+
+            print("TEST POPULATION AT GENERATION", self.__current_generation_num)
+            print()
             self.__scores = self.__test_population()
             for i in range(len(self.__population)):
-                print(self.__population[i])
-                print(self.__scores[i])
+                print("Genes of individual", i + 1, ":", self.__population[i])
+                print("Score for individual", i + 1, ":", self.__scores[i])
+            print()
 
             self.__selection()
-
+            print("RESULT OF GENERATION", self.__current_generation_num)
+            print()
             # record the most recent population into the history of the genetic algorithm
-            self.__old_populations[self.__current_generation_num] = self.__population
+            # self.__old_populations[self.__current_generation_num] = self.__population
+            for i in range(len(self.__population)):
+                print("Genes of individual", i + 1, ":", self.__population[i])
+                print("Score for individual", i + 1, ":", self.__scores[i])
+            print()
+        # for generation_num in self.__old_populations.keys():
+        #     print("Generation:", generation_num)
+        #     for individual in self.__old_populations[generation_num]:
+        #         print("Individual:", individual)
         print("GA run complete")

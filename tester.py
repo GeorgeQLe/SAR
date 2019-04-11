@@ -15,6 +15,5 @@ def test_group(population):
         simulation  = Simulation() # create an instance of the Simulation class
         simulation.setup_simulation(10, 10, AreaType.woodlands, 1, 1, individual)
         return_scores.append(simulation.run_simulation(30))
-        print("Simulation number:", counter, "complete")
         counter += 1
     return return_scores

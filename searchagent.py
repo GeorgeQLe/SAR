@@ -54,66 +54,66 @@ class SearchAgent:
         return environment.search_adjacent_tiles(self.__position[0], self.__position[1])
 
     def __move(self, direction = 0, environment = Environment()):
-        print("Moving")
+        # print("Moving")
         # checks to see if the search agent has enough fuel to move
         if (self.__fuel_level - 1) < 0:
-            print("No fuel")
+            # print("No fuel")
             if environment.check_home(self.__position[0], self.__position[1]):
                 # stay is only for the home tile and lets the search agent refuel
                 self.__fuel_level = self.__max_fuel
-                print("Refueled")
+                # print("Refueled")
             else:
-                print("Out of fuel")
+                # print("Out of fuel")
                 return Move_Error.NOTENOUGHFUEL
-        print("Old Position:", self.__position)
+        # print("Old Position:", self.__position)
         new_coord       = tuple()
         
         direction_nine  = True
         while direction_nine:
-            print(direction)
+            # print(direction)
             if direction == Direction.NW:
-                print("Move NW")
+                # print("Move NW")
                 new_coord = (self.__position[0] - 1 , self.__position[1] + 1)
                 direction_nine = False
             elif direction == Direction.N:
-                print("Move N")
+                # print("Move N")
                 new_coord = (self.__position[0], self.__position[1] + 1)
                 direction_nine = False
             elif direction == Direction.NE:
-                print("Move NE")
+                # print("Move NE")
                 new_coord = (self.__position[0] + 1, self.__position[1] + 1)
                 direction_nine = False
             elif direction == Direction.E:
-                print("Move E")
+                # print("Move E")
                 new_coord = (self.__position[0] + 1, self.__position[1])
                 direction_nine = False
             elif direction == Direction.SE:
-                print("Move SE")
+                # print("Move SE")
                 new_coord = (self.__position[0] + 1, self.__position[1] - 1)
                 direction_nine = False
             elif direction == Direction.S:
-                print("Move S")
+                # print("Move S")
                 new_coord = (self.__position[0], self.__position[1] - 1)
                 direction_nine = False
             elif direction == Direction.SW:
-                print("Move SW")
+                # print("Move SW")
                 new_coord = (self.__position[0] - 1, self.__position[1] - 1)
                 direction_nine = False
             elif direction == Direction.W:
-                print("Move W")
+                # print("Move W")
                 new_coord = (self.__position[0] + 1, self.__position[1])
                 direction_nine = False
             elif direction == Direction.STAY:
-                print("Stay")
+                # print("Stay")
                 new_coord = (self.__position[0], self.__position[1])
                 direction_nine = False
             elif direction == 9 or direction == 10:
-                print("Random movement")
+                # print("Random movement")
                 direction = randint(0, 8)
-        print(new_coord)
+        # print(new_coord)
         # checks to make sure that the new coordinates are actually in the environment
         if environment.check_tile(new_coord[0], new_coord[1]) == False:
-            print("Out of bounds")
+            # print("Out of bounds")
             return Move_Error.MOVEOUTOFBOUND
         # reduce the amount of fuel the search agent has by one
         self.__fuel_level    -= 1

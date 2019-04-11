@@ -15,9 +15,14 @@ def write_to_file(filename = str(), output = str(), directory = str()):
        with open(filename, 'w', encoding='utf-8') as f:
             f.write(output)
     elif len(directory) > 0 and len(filename) > 0:
-        pass
+        if valid_path(file_path = directory+filename):
+            pass
 
 def valid_directory(directory_path = str(), filename = str()):
+    if len(directory_path) == 0:
+        print("ERROR: DIRECTORY_PATH EMPTY")
+        return False
+
     if len(filename) > 0:
         config = Path(directory_path + filename)
         if config.is_file():
@@ -26,3 +31,10 @@ def valid_directory(directory_path = str(), filename = str()):
             return False
     else:
         return os.path.isdir(directory_path)
+
+def valid_path(file_path = str()):
+    if len(file_path) == 0:
+        return False
+
+    config = Path(file_path)
+    return config.is_file()

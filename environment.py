@@ -1,6 +1,5 @@
 # Copyright 2019 George Le
 
-from collections import defaultdict
 from adjacenttiles import AdjacentTiles, AreaType, TileType
 from tile import Tile, TileTargetInfo
 
@@ -18,7 +17,7 @@ class Environment:
         switched out for rivers and ponds).
 
     -----------------------------------------------------------------------------"""
-    def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0):
+    def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0, debug = True, debug_filename = "./Dump/Environment.txt", draw_filename = "./Dump/Environemnt_draw.txt"):
         self.__areatype             = areatype
         self.__grid                 = OrderedDict()
         self.__home_coord           = (0, 0)
@@ -27,6 +26,11 @@ class Environment:
         self.__targets              = { (int, int) : TileTargetInfo }
         self.__x                    = x
         self.__y                    = y
+
+        # determines whether or not the Environment class will output to the dump files
+        self.__debug                = debug # 
+        self.__debug_filename       = debug_filename #
+        self.__draw_filename        = draw_filename # 
 
         # this is a setup variable that should only be used during the set up of the simulation environment
         self.__generated_num_of_targets = 0
