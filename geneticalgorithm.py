@@ -118,7 +118,7 @@ class GeneticAlgorithm:
         print("Random roll1:", random_roll1)
         print("Random roll2:", random_roll2)
         while index < random_roll2:
-            nn_weights1[index], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
+            nn_weights1[index ], nn_weights2[index] = nn_weights2[index], nn_weights1[index]
             index += 1
         parent1 = nn_weights1
         parent2 = nn_weights2
