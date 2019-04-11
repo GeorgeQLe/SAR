@@ -1,5 +1,14 @@
 # Copyright 2019 George Le
+import os
 from pathlib import Path
+
+def add_endslash(directory_path = str()):
+    if len(directory_path) == 0:
+        return directory_path
+    elif len(directory_path) > 0:
+        if directory_path[len(directory_path) - 1] == '/':
+            return directory_path
+    return directory_path + "/"
 
 def write_to_file(filename = str(), output = str(), directory = str()):
     if len(directory) == 0 and len(filename) > 0:
@@ -8,9 +17,12 @@ def write_to_file(filename = str(), output = str(), directory = str()):
     elif len(directory) > 0 and len(filename) > 0:
         pass
 
-def check_directory(directory_path, filename):
-    config = Path(directory_path + filename)
-    if config.is_file():
-        return True
+def valid_directory(directory_path = str(), filename = str()):
+    if len(filename) > 0:
+        config = Path(directory_path + filename)
+        if config.is_file():
+            return True
+        else:
+            return False
     else:
-        return False
+        return os.path.isdir(directory_path)

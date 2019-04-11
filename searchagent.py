@@ -2,6 +2,7 @@
 
 import enum
 
+from file import write_to_file
 from environment import AdjacentTiles, Environment
 from neuralnetwork import NeuralNetwork
 from tile import resolve_tiletype_as_float, TileTargetInfo, TileType
@@ -30,20 +31,24 @@ class SearchAgentsType(enum.Enum):
 
 class SearchAgent:
     def __init__(self, initial_position_x = 0, initial_position_y = 0, search_skill = 2, fuel_level = 0, max_fuel = 0, search_agent_type = SearchAgentsType.human, ID = 0):
-        self.__brain            = NeuralNetwork()
-        self.__falsepos_list    = [ (int, int) ]
-        self.__fuel_level       = fuel_level
+        self.__brain            = NeuralNetwork()   # the controller of the SearchAgent class
         self.__ID               = ID
-        self.__invalid_moves    = 0
-        self.__max_fuel         = max_fuel
+        self.__type             = search_agent_type
+        
         self.__empty_fuel       = False
+        self.__max_fuel         = max_fuel
+        self.__fuel_level       = fuel_level
+        
+        self.__invalid_moves    = 0
         self.__path_taken       = OrderedDict()
         self.__position         = (initial_position_x, initial_position_y)
-        self.__search_skill     = search_skill
         self.__steps_taken      = 0
-        self.__targets_found    = 0
         self.__turns_taken      = 0
-        self.__type             = search_agent_type
+        
+        
+        self.__falsepos_list    = list() # a list of the coordinates of false positives that the SearchAgent class found
+        self.__search_skill     = search_skill
+        self.__targets_found    = 0
 
     def __get_adjacent_tiles(self, environment = Environment()):
         return environment.search_adjacent_tiles(self.__position[0], self.__position[1])
@@ -133,7 +138,12 @@ class SearchAgent:
         move_result = self.__move(direction=decision, environment=environment)
         if isinstance(move_result, TileTargetInfo):
             if move_result == TileTargetInfo.falsepos:
-                self.__falsepos_list.append(self.__position)
+                # if the SearchAgent found a falsepositive and has not seen it before
+                # then add it to the list of falsepositive coordinates
+                if self.__position not in self.__falsepos_list:
+                    self.__falsepos_list.append(self.__position)
+                elif self.__position in self.__falsepos_list:
+                    self.__falsepos_list.remove(self.__position)
             elif move_result == TileTargetInfo.target:
                 self.__targets_found += 1
         elif isinstance(move_result, Move_Error):

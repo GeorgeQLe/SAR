@@ -11,7 +11,7 @@ from operator import itemgetter
 class GeneticAlgorithm:
 
     def __init__(self):
-        self.__current_generation_num       = 0
+        self.__current_generation_num       = 0 # a counter which tracks the current generation that the GA is running
         self.__mutation_rate_single_point   = 50 # the rate in which single point crossover happens in the GA, default is 50%
         self.__mutation_rate_two_point      = 75 # the rate in which two point crossover happens in the GA, default is 75%
         self.__mutation_rate                = 5 # the rate in which a fixed point mutation occurs in the GA, default is 5%
@@ -185,9 +185,6 @@ class GeneticAlgorithm:
 
             self.__selection()
 
-        #     # record the most recent population into the history of the genetic algorithm
-        #     self.__old_populations[self.__current_generation_num] = self.__population
-        # for i in range(len(self.__population)):
-        #     print(self.__population[i])
-        #     print(self.__scores[i])
+            # record the most recent population into the history of the genetic algorithm
+            self.__old_populations[self.__current_generation_num] = self.__population
         print("GA run complete")
