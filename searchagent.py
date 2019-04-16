@@ -44,7 +44,7 @@ class SearchAgent:
         self.__position         = (initial_position_x, initial_position_y)
         self.__steps_taken      = 0
         self.__turns_taken      = 0
-        
+        self.__random_choices   = 0
         
         self.__falsepos_list    = list() # a list of the coordinates of false positives that the SearchAgent class found
         self.__search_skill     = search_skill
@@ -110,6 +110,7 @@ class SearchAgent:
             elif direction == 9 or direction == 10:
                 # print("Random movement")
                 direction = randint(0, 8)
+                self.__random_choices+=1
         # print(new_coord)
         # checks to make sure that the new coordinates are actually in the environment
         if environment.check_tile(new_coord[0], new_coord[1]) == False:
@@ -168,6 +169,8 @@ class SearchAgent:
         return len(self.__falsepos_list) - len(set(self.__falsepos_list))
     def path_taken(self):
         return self.__path_taken
+    def random_choices(self):
+        return self.__random_choices
     def steps(self):
         return self.__steps_taken
     def targets_found(self):

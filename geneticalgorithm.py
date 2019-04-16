@@ -6,8 +6,7 @@ from tester import test_individual, test_group
 
 from collections import OrderedDict
 from random import randint, uniform
-
-from operator import itemgetter
+from statistics import median
 
 class GeneticAlgorithm:
 
@@ -38,7 +37,7 @@ class GeneticAlgorithm:
             individual = list()
             # create neural network representation
             for j in range(self.__number_of_individual_genes):
-                individual.append(round(uniform(-2.0, 2.3), 4))
+                individual.append(round(uniform(-2.0, 2.0), 4))
             self.__population.append(individual)
             
     def __selection(self):
@@ -68,28 +67,36 @@ class GeneticAlgorithm:
         self.__replacement(parents[0], parents[1])
 
     def __tournament_pool(self):
-        # determine if there will be a mutation at all
-        random_roll     = randint(1, 100)
-        # stores the best from the first selection from the population
+        # stores the best index from the first selection from the population
         stored_best     = list()
-
         # selected parents for the replacement
-        parents  = list()
-
+        parents         = list()
         
         # selects 2 parents out of the four
         while len(parents) != 2:
-            # selecting individuals from the population
-            tp_indexes        = list()
+            # selecting individuals from the population, stores the indexes of the selected individuals
+            tp_indexes  = list()
+            tp_scores   = list()
             while len(tp_indexes) != 4:
                 random_roll = randint(0, len(self.__population) - 1)
                 if random_roll not in tp_indexes and random_roll not in stored_best:
                     tp_indexes.append(random_roll)
-
-            best_score          = max(tp_indexes)
-            best_score_index    = tp_indexes.index(best_score)
+                    tp_scores.append(self.__scores[random_roll])
+            
+            # from the selected individuals, get the best score
+            best_score  = max(tp_scores)
+            # with the best score get the index of the individual with the best score
+            # if there are ties, will select the smallest index of the best score 
+            best_score_index = self.__scores.index(best_score)
+            if best_score_index in stored_best:
+                indices = [i for i, x in enumerate(self.__scores) if x == best_score]
+                for index in indices:
+                    if index not in stored_best:
+                        best_score_index = index
+                        break
             # add the selected two best parents
             parents.append(self.__population[best_score_index])
+            # set stored_best to best scored index
             stored_best.append(best_score_index)
         print("Selected parents at indexes:", stored_best)
         return parents
@@ -171,14 +178,8 @@ class GeneticAlgorithm:
             print("New Individual:", self.__population[min_index])
             self.__scores[min_index] = score1
 
-        previous_min_index = min_index
         min_score = min(self.__scores)
         min_index = self.__scores.index(min_score)
-        
-        # if min_index == previous_min_index:
-        #     i = 0
-        #     while i < len(self.__scores):
-        #         pass
 
         if score2 > min_score:
             print("Replace parent 2 with individual", min_index + 1)
@@ -187,6 +188,46 @@ class GeneticAlgorithm:
             self.__population[min_index] = parent2
             print("New Individual:", self.__population[min_index])
             self.__scores[min_index] = score2
+
+        self.__stable_replacement()
+    
+    def __stable_replacement(self):
+        self.__custom_quicksort(0, len(self.__scores) - 1)
+
+        # get the median score of the current population
+        median_score = median(self.__scores)
+        cutoff_index = self.__scores.index(median_score)
+
+        for population_index in range(cutoff_index, len(self.__population)):
+            individual = list()
+            for individual_index in range(self.__number_of_individual_genes):
+                individual.append(round(uniform(-2.0, 2.0), 4))
+            self.__population[population_index] = individual
+
+    def __custom_quicksort(self, low, high):
+        if low < high:
+            # pi is partition index, self.__scores[p] is now at the right place
+            pi = self.__custom_partition(low, high)
+
+            # separately sort elements before partition and after partition
+            self.__custom_quicksort(low, pi - 1)
+            self.__custom_quicksort(pi + 1, high)
+
+    def __custom_partition(self, low, high):
+        index = low - 1     # index of smaller element
+        pivot = self.__scores[high]   # pivot
+
+        for j in range(low, high):
+            # If current element is smaller than or equal to pivot
+            if self.__scores[j] <= pivot:
+                # increment index of smaller element
+                index = index + 1
+                self.__scores[index],self.__scores[j] = self.__scores[j], self.__scores[index]
+                self.__population[index],self.__population[j] = self.__population[j], self.__population[index]
+        self.__scores[index + 1],self.__scores[high] = self.__scores[high], self.__scores[index + 1]
+        self.__population[index + 1], self.__population[high] = self.__population[high], self.__population[index + 1]
+        return (index + 1)
+            
 
     def __test_population(self):
         # test the current population and return the resulting scores
@@ -199,7 +240,7 @@ class GeneticAlgorithm:
         self.__number_of_individual_genes   = number_of_individual_genes
 
         while self.__current_generation_num < self.__number_of_generations:
-            self.__current_generation_num       += 1
+            self.__current_generation_num   += 1
             print("START GENERATION", self.__current_generation_num)
             print()
             if len(self.__population) > 0:
