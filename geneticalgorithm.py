@@ -198,7 +198,7 @@ class GeneticAlgorithm:
         median_score = median(self.__scores)
         cutoff_index = self.__scores.index(median_score)
 
-        for population_index in range(cutoff_index, len(self.__population)):
+        for population_index in range(0, cutoff_index):
             individual = list()
             for individual_index in range(self.__number_of_individual_genes):
                 individual.append(round(uniform(-2.0, 2.0), 4))
