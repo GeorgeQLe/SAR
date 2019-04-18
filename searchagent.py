@@ -10,16 +10,6 @@ from tile import resolve_tiletype_as_float, TileTargetInfo, TileType
 from collections import OrderedDict
 from random import randint
 
-class Direction(enum.IntEnum):
-    STAY    = 0
-    NW      = 1
-    N       = 2
-    NE      = 3
-    E       = 4
-    SE      = 5
-    S       = 6
-    SW      = 7
-    W       = 8
 
 class Move_Error(enum.IntEnum):
     NOTENOUGHFUEL   = 0
@@ -68,49 +58,39 @@ class SearchAgent:
         # print("Old Position:", self.__position)
         new_coord       = tuple()
         
-        direction_nine  = True
-        while direction_nine:
             # print(direction)
-            if direction == Direction.NW:
-                # print("Move NW")
-                new_coord = (self.__position[0] - 1 , self.__position[1] + 1)
-                direction_nine = False
-            elif direction == Direction.N:
-                # print("Move N")
-                new_coord = (self.__position[0], self.__position[1] + 1)
-                direction_nine = False
-            elif direction == Direction.NE:
-                # print("Move NE")
-                new_coord = (self.__position[0] + 1, self.__position[1] + 1)
-                direction_nine = False
-            elif direction == Direction.E:
-                # print("Move E")
-                new_coord = (self.__position[0] + 1, self.__position[1])
-                direction_nine = False
-            elif direction == Direction.SE:
-                # print("Move SE")
-                new_coord = (self.__position[0] + 1, self.__position[1] - 1)
-                direction_nine = False
-            elif direction == Direction.S:
-                # print("Move S")
-                new_coord = (self.__position[0], self.__position[1] - 1)
-                direction_nine = False
-            elif direction == Direction.SW:
-                # print("Move SW")
-                new_coord = (self.__position[0] - 1, self.__position[1] - 1)
-                direction_nine = False
-            elif direction == Direction.W:
-                # print("Move W")
-                new_coord = (self.__position[0] + 1, self.__position[1])
-                direction_nine = False
-            elif direction == Direction.STAY:
-                # print("Stay")
-                new_coord = (self.__position[0], self.__position[1])
-                direction_nine = False
-            elif direction == 9 or direction == 10:
-                # print("Random movement")
-                direction = randint(0, 8)
-                self.__random_choices+=1
+        if direction < 0.125:
+            # print("Move NW")
+            new_coord = (self.__position[0] - 1 , self.__position[1] + 1)
+            direction_nine = False
+        elif direction < 0.25:
+            # print("Move N")
+            new_coord = (self.__position[0], self.__position[1] + 1)
+            direction_nine = False
+        elif direction < 0.375:
+            # print("Move NE")
+            new_coord = (self.__position[0] + 1, self.__position[1] + 1)
+            direction_nine = False
+        elif direction < 0.5:
+            # print("Move E")
+            new_coord = (self.__position[0] + 1, self.__position[1])
+            direction_nine = False
+        elif direction < 0.625:
+            # print("Move SE")
+            new_coord = (self.__position[0] + 1, self.__position[1] - 1)
+            direction_nine = False
+        elif direction < 0.75:
+            # print("Move S")
+            new_coord = (self.__position[0], self.__position[1] - 1)
+            direction_nine = False
+        elif direction < 0.875:
+            # print("Move SW")
+            new_coord = (self.__position[0] - 1, self.__position[1] - 1)
+            direction_nine = False
+        elif direction < 1.0:
+            # print("Move W")
+            new_coord = (self.__position[0] + 1, self.__position[1])
+            direction_nine = False
         # print(new_coord)
         # checks to make sure that the new coordinates are actually in the environment
         if environment.check_tile(new_coord[0], new_coord[1]) == False:
@@ -134,7 +114,6 @@ class SearchAgent:
         nn_inputs.append(float(self.__fuel_level))
 
         decision = self.__brain.evaluate(nn_inputs)
-        decision = int(round(decision, 1) * 10)
 
         move_result = self.__move(direction=decision, environment=environment)
         if isinstance(move_result, TileTargetInfo):
