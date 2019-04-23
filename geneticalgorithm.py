@@ -195,10 +195,7 @@ class GeneticAlgorithm:
         self.__custom_quicksort(0, len(self.__scores) - 1)
 
         # get the median score of the current population
-        median_score = median(self.__scores)
-        cutoff_index = self.__scores.index(median_score)
-
-        for population_index in range(0, cutoff_index):
+        for population_index in range(0, round(len(self.__scores)/2)):
             individual = list()
             for individual_index in range(self.__number_of_individual_genes):
                 individual.append(round(uniform(-2.0, 2.0), 4))
