@@ -125,8 +125,6 @@ class Environment:
                             has_agent = True
                             break
                     if has_agent != True:
-                        if self.__grid[x, y].tiletype() == TileType.home:
-                            print("H", end="|")
                         if self.__grid[x, y].is_falsepos() == True:
                             print("O", end="|")
                         elif self.__grid[x, y].is_target() == True:

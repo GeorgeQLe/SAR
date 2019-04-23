@@ -24,7 +24,7 @@ class AreaTileProbabilities:
                                 (TileType.plains, 5), 
                                 (TileType.pond, 7), 
                                 (TileType.river, 9), 
-                                (TileType.swamp, 10)]
+                                (TileType.swamp, 11)]
 
         self.__islands =        [(TileType.forest, 3),
                                 (TileType.mountain, 4),
@@ -83,7 +83,6 @@ class AreaTileProbabilities:
             return OrderedDict(self.__swamplands)
         elif areatype == AreaType.woodlands:
             return OrderedDict(self.__woodlands)
-        print("Shouldn't get here")
         return OrderedDict(self.__default)
 
 def generate_random_tile(areatype = AreaType.default, highest_possible_roll = 10):

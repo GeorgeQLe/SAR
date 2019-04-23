@@ -23,7 +23,7 @@ def main():
             0 : (9, 5),
             1 : (5, 1)
             }), 
-            num_generations= 10, 
+            num_generations= 100, 
             number_of_individuals= 10, 
             number_of_individual_genes= 50)
 

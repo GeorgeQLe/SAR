@@ -39,7 +39,7 @@ class Simulation:
             # print("Turn", i + 1)
             for j in range(len(self.__searchagents)):
                 self.__environment.move_search_agent(searchagent_ID= self.__searchagents[j].get_ID(), new_position= self.__searchagents[j].turn(self.__environment))
-            # self.__environment.draw()
+            self.__environment.draw()
         for i in range(len(self.__searchagents)):
             return_scores.append(grade(agent= self.__searchagents[i]))
 
