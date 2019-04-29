@@ -1,297 +1,179 @@
 # Copyright 2019 George Le
 
-from adjacenttiles import AdjacentTiles, AreaType, TileType
-from tile import Tile, TileTargetInfo
-
 from collections import OrderedDict
-import random
+from random import randint
+
+from coord import Coord
+from direction import Direction, northwest, north, northeast, east, southeast, south, southwest, west
+from tiletype import TileType
 
 class Environment:
-    """-----------------------------------------------------------------------------
 
-        This class is used by the class simulation in order to train and test
-        search agents. This environment runs using 5E D&D rules: grids are 5x5 ft,
-        each round takes 6 seconds, agents can move in eight cardinal directions,
-        and the grid is made up of tiles that loosely correspond to the MTG lands -
-        (the only amend is islands would be a pain to program so they are instead
-        switched out for rivers and ponds).
+    def __init__(self, x_max = 10, y_max = 10):
+        self.x              = x_max  # specifies the max x coordinate
+        self.y              = y_max  # specifies the max y coordinate
 
-    -----------------------------------------------------------------------------"""
-    def __init__(self, areatype = AreaType.default, x = 0, y = 0, num_targets = 0, debug = True, debug_filename = "./Dump/Environment.txt", draw_filename = "./Dump/Environemnt_draw.txt"):
-        self.__areatype             = areatype
-        self.__grid                 = OrderedDict()
-        self.__home_coord           = (0, 0)
-        self.__num_targets          = num_targets
-        self.__searchagents         = { int : (int, int) } # search agent ID : coordinates
-        self.__targets              = { (int, int) : TileTargetInfo }
-        self.__x                    = x
-        self.__y                    = y
+        self.grid           = dict() # a dict which holds a key-value pair of Coord to Tiletype
 
-        # determines whether or not the Environment class will output to the dump files
-        self.__debug                = debug # 
-        self.__debug_filename       = debug_filename #
-        self.__draw_filename        = draw_filename # 
+        self.num_agents     = 0      # holds the number of search agents that are currently in the environment grid
+        self.searchagents   = list() # list of coordinates for the search agents currently in the environment grid
 
-        # this is a setup variable that should only be used during the set up of the simulation environment
-        self.__generated_num_of_targets = 0
-        self.__good_grid = False
+        self.num_targets    = 0      # holds the number of targets that are still in the environment grid
+        self.target_coords  = list() # list of coordinates for the targets currently in the environment grid
+        self.target_set     = False  # boolean value which tracks whether or not a target has been created in the grid
+        self.total_targets  = 0      # hold the total number of targets that are in the environment grid
 
-    def __generate_null_tile(self, x, y):
-        """---------------------------------------------------------------------------------
+    def add_search_agent(self, start_coord = Coord(0, 0), num_search_agents = 1):
+        if num_search_agents >= 1:
+            for i in range(num_search_agents):
+                self.searchagents.append(start_coord)
 
-            This function creates a non-usaable tile to be used to initialize the grid.
-        
-        ---------------------------------------------------------------------------------"""
-        # creates a temp tile that will be returned by the function
-        temp = Tile(x=x, y=y)
-        temp.set_target(False)
-        temp.set_tile_type(TileType.void)
-        return temp
+    def add_target(self, random = True, set_location = Coord(0, 0)):
+        if random == True:
+            self.target_coords.append(Coord(randint(0, self.x - 1), randint(0, self.y - 1)))
+            self.num_targets+=1
+            self.total_targets+=1
+        else:
+            self.target_coords.append(set_location)
+            self.num_targets+=1
+            self.total_targets+=1
+        self.target_set = True
+    def add_targets(self, random = True, target_locations = list(), num_targets = 1):
+        if len(target_locations) == 0:
+            return
+        if random == True:
+            for i in range(num_targets):
+                self.target_coords.append(Coord(randint(0, self.x - 1), randint(0, self.y - 1)))
+            self.num_targets+=num_targets
+            self.total_targets+=num_targets
+        else:
+            for location in target_locations:
+                if isinstance(location, Coord):
+                    self.target_coords.append(location)
+            self.num_targets+=num_targets
+            self.total_targets+=num_targets
+        self.target_set = True
 
-    def __generate_tile(self, x, y, frequency_falsepos):
-        """---------------------------------------------------------------
-
-            This function controls how the environment class generates a
-            tile at a certain coordinate.
-            
-        ---------------------------------------------------------------"""
-        # creates a temp tile that will be returned by the function
-        temp = Tile(x=x, y=y)
-        
-        # for the origin
-        if x == 0 and y == 0:
-            # the tile at the origin is set as home
-            temp.set_tile_type(TileType.home)
-            return temp
-        
-        # generates a tile from the adjacent tiles to the current tile
-        temp_tiletype = self.search_adjacent_tiles(x, y).generate_tiletype_from_adj(self.__areatype)
-        temp.set_tile_type(temp_tiletype)
-
-        return temp
-
-    def add_search_agents(self, num_searchagents = 0):
-        for i in range(num_searchagents - 1):
-            self.__searchagents[i] = self.__home_coord
-
-    def change_home_tile(self, x = 0, y = 0):
-        self.__home_coord = (x, y)
-
-    def check_home(self, x = 0, y = 0):
-        if self.check_tile(x, y) == True:
-            if self.__grid[x, y] == TileType.home:
-                return True
+    def check_target(self, potential_coord):
+        if potential_coord in self.target_coords:
+            self.found_target(potential_coord)
+            return True
         return False
+    def found_target(self, found_coord = Coord(0, 0)):
+        self.target_coords.remove(found_coord)
+        self.num_targets-=1
 
-    def check_tile(self, x = 0, y = 0):
-        """---------------------------------------------------------------
-
-            This function checks to see if the tile is in the grid. If it 
-            is return True, if not return False.
-            
-        ---------------------------------------------------------------"""
-        coord = (x, y)
-        # checks to see if the coordinates are in the grid
-        for grid_coord in self.__grid.keys():
-            if grid_coord == coord:
-                return True
-        return False
-        
+    def remove_target(self, remove_coord = Coord(0, 0)):
+        if self.total_targets == 0:
+            return
+        else:
+            self.target_coords.remove(remove_coord)
+            self.num_targets-=1
+            self.total_targets-=1
+    def remove_all_targets(self):
+        if self.total_targets == 0:
+            return
+        else:
+            self.target_coords.clear()
+            self.num_targets = 0
+            self.target_set = False
+            self.total_targets = 0
 
     def draw(self):
-        """------------------------------------------------------------------
+        pass
 
-            This function prints out the various representations of the
-            grid's tile to stdout. The representations are based on the
-            tiletype of the tile and taking priority over the tiletype,
-            is whether the tile is a target (or falsepos) for the search 
-            agent.
+    def generate(self):
+        for y in range(self.y):
+            for x in range(self.x):
+                random_roll = randint(1, 100)
+                if random_roll < 90:
+                    self.grid[Coord(x, y)] = TileType.empty
+                else:
+                    self.grid[Coord(x, y)] = TileType.obstacle
+        for target_coord in self.target_coords:
+            self.grid[target_coord] = TileType.target
+    def clear(self):
+        self.grid.clear()
 
-        ------------------------------------------------------------------"""
-        print("Search agents info")
-        for i in range(len(self.__searchagents) - 1):
-            print(self.__searchagents[i + 1])
-        if self.__good_grid == True:
-            for i in range(self.__x * 2 + 1):
-                print("-", end="")
-            print()
-            for y in range(self.__y):
-                print("|", end="")
-                for x in range(self.__x):
-                    has_agent = False
-                    for i in range(len(self.__searchagents) - 1):
-                        if self.__searchagents[i + 1] == (x, y):
-                            print("1", end="|")
-                            has_agent = True
-                            break
-                    if has_agent != True:
-                        if self.__grid[x, y].is_falsepos() == True:
-                            print("O", end="|")
-                        elif self.__grid[x, y].is_target() == True:
-                            print("X", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.forest:
-                            print("Y", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.mountain:
-                            print("^", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.plains:
-                            print("_", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.pond:
-                            print("=", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.river:
-                            print("~", end="|")
-                        elif self.__grid[x, y].tiletype() == TileType.swamp:
-                            print(".", end="|")
-                print("")
-                for i in range(self.__x * 2 + 1):
-                    print("-", end="")
-                print()
-            print()
+    def move_searchagent(self, agent_id, direction = Direction()):
+        pass
+    def get_adjacent_tiles(self, agent_id):
+        return_tiletypes    = list() # list of tiletypes of the tiles adjacent to the current agent
+        current_coord       = self.searchagents[agent_id]
 
-    def empty(self):
-        """-----------------------------------------------------------------------------------------------------
-
-            This function clears the environment and sets the environment to not good so that it cant be used.
-        
-        -----------------------------------------------------------------------------------------------------"""
-        self.__grid.clear()
-        self.__good_grid = False
-
-    def generate(self, frequency_falsepos):
-        """---------------------------------------------------------------
-
-            This function creates the grid in a pseudo-random manner.
-        
-        ---------------------------------------------------------------"""
-        # initialize the grid and fills it with "null" tiles
-        for x in range(self.__x):
-            for y in range(self.__y):
-                self.__grid[x, y] = self.__generate_null_tile(x, y)
-        # pseudo-randomly generate tiles on the grid
-        for y in range(self.__x):
-            for x in range(self.__y):
-                # print("Tile at: ", x, ",", y)
-                self.__grid[x, y] = self.__generate_tile(x, y, frequency_falsepos)
-
-        # generates the tiles for the grid
-        while self.__generated_num_of_targets < self.__num_targets:
-            # randomly roll to get the coordinate for the new target/falsepos
-            random_x = random.randint(0, self.__x - 1)
-            random_y = random.randint(0, self.__y - 1)
-
-            # randomly roll to see if the new target is a false positive
-            random_roll = random.randint(1, 101)
-
-            # checks to see if the random roll warrants the tile being a target or falsepos
-            if random_roll < frequency_falsepos:
-                # print("Set target - falsepos")
-                self.__grid[random_x, random_y].set_target(True)
-                self.__targets[random_x, random_y] = TileTargetInfo.falsepos
-            else:
-                # print("Set target")
-                self.__grid[random_x, random_y].set_target(False)
-                self.__targets[random_x, random_y] = TileTargetInfo.target
-                # the target only counts to the number of valid generated targets if it is not a falsepos
-                self.__generated_num_of_targets += 1
-        
-        # the grid now is ready for use
-        self.__good_grid = True
-
-    def get_number_of_targets(self):
-        return len(self.__targets)
-
-    def get_tiletype_at_coord(self, x = 0, y = 0):
-        if self.check_tile(x, y) == True:
-            return self.__grid[x, y].tiletype()
-
-    def move_search_agent(self, searchagent_ID = -1, new_position = (-1, -1)):
-        self.__searchagents[searchagent_ID] = new_position
-
-    def search_adjacent_tiles(self, x, y):
-        """-------------------------------------------------------------------------------
-
-            This function searches the adjacent tiles (in all eight cardinal directions)
-            and returns a class that contains the tiletype of the eight adjacent tiles.
-        
-        -------------------------------------------------------------------------------"""
-        # creates a temp AdjacentTiles class to be returned by this function
-        return_adjacent_tiles = AdjacentTiles()
-        # checks to make sure that the passed in tile is within the confines of the grid
-        if x >= self.__x or y >= self.__y:
-            return return_adjacent_tiles
-
-        # for tiles in the center of the environment grid
-        if x > 0 and x < self.__x - 1 and y > 0 and y < self.__y - 1:
-            return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
-                                            N=self.__grid[x, y + 1].tiletype(), 
-                                            NE=self.__grid[x + 1, y + 1].tiletype(),
-                                            E=self.__grid[x + 1, y].tiletype(),
-                                            SE=self.__grid[x + 1, y - 1].tiletype(),
-                                            S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y + 1].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        elif x == 0 and y == 0: # for tiles in the origin and the bottom left corner
-            return_adjacent_tiles.add_tiles(N=self.__grid[x, y + 1].tiletype(), 
-                                            NE=self.__grid[x + 1, y + 1].tiletype(),
-                                            E=self.__grid[x + 1, y].tiletype())
-        elif x == 0 and y == self.__y - 1: # for tile in top left corner
-            return_adjacent_tiles.add_tiles(E=self.__grid[x + 1, y].tiletype(),
-                                            SE=self.__grid[x + 1, y - 1].tiletype(),
-                                            S=self.__grid[x, y - 1].tiletype())
-        elif x == self.__x - 1 and y == self.__y - 1: # for tile in top right corner
-            return_adjacent_tiles.add_tiles(S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y - 1].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        elif x == self.__x - 1 and y == 0: # for tile in bottom right corner
-            return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
-                                            N=self.__grid[x, y + 1].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        elif x == 0 and y > 0: # for tiles in left side
-            return_adjacent_tiles.add_tiles(N=self.__grid[x, y + 1].tiletype(), 
-                                            NE=self.__grid[x + 1, y + 1].tiletype(),
-                                            E=self.__grid[x + 1, y].tiletype(),
-                                            SE=self.__grid[x + 1, y - 1].tiletype(),
-                                            S=self.__grid[x, y - 1].tiletype())
-        elif x == self.__x - 1 and y > 0: # for tiles in right side
-            return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
-                                            N=self.__grid[x, y + 1].tiletype(), 
-                                            S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y + 1].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        elif x > 0 and y == 0: # for tiles in bottom row
-            return_adjacent_tiles.add_tiles(NW=self.__grid[x - 1, y + 1].tiletype(),
-                                            N=self.__grid[x, y + 1].tiletype(), 
-                                            NE=self.__grid[x + 1, y + 1].tiletype(),
-                                            E=self.__grid[x + 1, y].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        elif x > 0 and y == self.__y - 1: # for tiles in the top row
-            return_adjacent_tiles.add_tiles(E=self.__grid[x + 1, y].tiletype(),
-                                            SE=self.__grid[x + 1, y - 1].tiletype(),
-                                            S=self.__grid[x, y - 1].tiletype(),
-                                            SW=self.__grid[x - 1, y - 1].tiletype(),
-                                            W=self.__grid[x - 1, y].tiletype())
-        return return_adjacent_tiles
-
-    def search_tile(self, x = 1, y = 1, search_skill = 2):
-        coord = (x, y)
-        if coord in self.__targets.keys():
-            # if the current tile triggers a false positive, give the search agent a chance to resolve
-            # the falsepositive
-            if self.__targets[coord] == TileTargetInfo.falsepos and random.randint(1, 10) <= search_skill:
-                self.__targets.pop(coord)
-                return TileTargetInfo.falsepos
-            elif self.__targets[coord] == TileTargetInfo.target:
-                self.__targets.pop(coord)
-                return TileTargetInfo.target
+        # get the northwest tiletype
+        nw                  = northwest(current_coord)
+        if nw in self.grid.keys():
+            # appends to the list of tiletypes to be returned 
+            return_tiletypes.append(self.grid[nw])
         else:
-            return TileTargetInfo.empty
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
 
-    def set_environment(self, x = 1, y = 1, areatype = AreaType.default, num_targets = 1):
-        """------------------------------------------------------------------
+        # get the north tiletype
+        n                   = north(current_coord)
+        if n in self.grid.keys():
+            return_tiletypes.append(self.grid[n])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
 
-            This function is the setter function for the environment class.
-        
-        ------------------------------------------------------------------"""
-        self.__areatype     = areatype
-        self.__num_targets  = num_targets
-        self.__x            = x
-        self.__y            = y
+        # get the northeast tiletype
+        ne                  = northeast(current_coord)
+        if ne in self.grid.keys():
+            return_tiletypes.append(self.grid[ne])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        # get the east tiletype
+        e                   = east(current_coord)
+        if e in self.grid.keys():
+            return_tiletypes.append(self.grid[e])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        # get the southeast tiletype
+        se                  = southeast(current_coord)
+        if se in self.grid.keys():
+            return_tiletypes.append(self.grid[se])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        # get the south tiletype
+        s                   = south(current_coord)
+        if s in self.grid.keys():
+            return_tiletypes.append(self.grid[s])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        # get the southwest tiletype
+        sw                  = southwest(current_coord)
+        if sw in self.grid.keys():
+            return_tiletypes.append(self.grid[sw])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        # get the west tiletype
+        w                   = west(current_coord)
+        if w in self.grid.keys():
+            return_tiletypes.append(self.grid[w])
+        else:
+            # choosen coordinate is outside the grid so therefore is a wall
+            return_tiletypes.append(TileType.wall)
+
+        return return_tiletypes
+
+    def searchagent_position(self, agent_id):
+        return self.searchagents[agent_id]
+
+    def valid_coord(self, requested_coord):
+        if (requested_coord.x < self.x) and (requested_coord.y < self.y) and (requested_coord.x >= 0) and (requested_coord.y >= 0):
+            return True
+        return False
+
+    

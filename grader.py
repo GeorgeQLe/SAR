@@ -1,5 +1,4 @@
 # Copyright 2019 George Le
-
 from searchagent import SearchAgent
 
 def grade(agent):

@@ -5,7 +5,6 @@ from math import exp
 from random import uniform
 
 def sigmoid(input):
-    # print("Sigmoid:", 1.0 / (1.0 + exp(input * -1)))
     return (1.0 / (1.0 + exp(input * -1)))
 
 class NeuralNetwork:
@@ -17,18 +16,18 @@ class NeuralNetwork:
         if len(layers_info.keys()) != num_layers - 1:
             return
 
-        self.__bias                 = bias
+        self.__bias                 = bias          
         self.__output               = 0
-        self.__layers_info          = layers_info # this is a dict that holds a key-value pair 
-                                                  # => (Key - layer index) : (Value - Tuple (number of neuron weights, number of neurons))
-        self.__num_layers           = num_layers
+        self.__layers_info          = layers_info   # this is a dict that holds a key-value pair 
+                                                    # => (Key - layer index) : (Value - Tuple (number of neuron weights, number of neurons))
+        self.__num_layers           = num_layers    
         self.__num_weights          = num_weights
         
         temp_weights                = weights
         if len(weights) == 0:
             temp_weights.clear()
             for i in range(self.__num_weights):
-                temp_weights.append(round(uniform(0.0, 1.0), 2))
+                temp_weights.append(round(uniform(-2, 2), 4))
         self.__weights              = temp_weights
 
     def __evaluate_neural_net_layer(self, layerNi = list(), weightsGi = list()):
@@ -36,9 +35,9 @@ class NeuralNetwork:
             return -1.0
         else:
             sum                     = 0
+
             for j in range(len(layerNi)):
-                sum += (layerNi[j] * weightsGi[j])
-            # print("Sum:", sum)
+                sum += ((layerNi[j] * weightsGi[j]) - self.__bias)
             return sigmoid(sum)
 
     def evaluate(self, inputN1 = list()):
