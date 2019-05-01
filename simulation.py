@@ -11,7 +11,7 @@ class Simulation:
         self.__frequency_falsepos   = 0
         self.__searchagents         = list()
 
-    def __setup_test_environment(self, x = 1, y = 1, num_search_targets = 1):
+    def __setup_test_environment(self, x = 1, y = 1):
         pass
 
     def __setup_search_agents(self, num_search_agents = 1, searchagents = list()):
@@ -26,7 +26,7 @@ class Simulation:
                 temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= i + 1)
                 temp.set_brain(searchagents[i])
                 self.__searchagents.append(temp)
-        self.__environment.add_searchagents(num_search_agents)
+        self.__environment.add_search_agent(num_search_agents= num_search_agents)
 
     def run_simulation(self, num_of_turns = 300):
         return_scores = list()
@@ -45,6 +45,6 @@ class Simulation:
         self.__environment.empty()
         return return_scores
 
-    def setup_simulation(self, x = 1, y = 1, areatype = AreaType.default, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
-        self.__setup_test_environment(x, y, areatype, num_search_agents)
+    def setup_simulation(self, x = 1, y = 1, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
+        self.__setup_test_environment(x, y)
         self.__setup_search_agents(num_search_agents, searchagents)

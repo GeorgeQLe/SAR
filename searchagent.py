@@ -63,3 +63,6 @@ class SearchAgent:
                                                             0 : (9, 5),
                                                             1 : (5, 1)
                                                             }), num_weights= 50, weights= new_brain)
+
+    def successful_return(self):
+        pass

@@ -3,9 +3,15 @@
 from collections import OrderedDict
 from random import randint
 
+import enum
+
 from coord import Coord
 from direction import Direction, northwest, north, northeast, east, southeast, south, southwest, west
 from tiletype import TileType
+
+class MoveResult(enum.IntEnum):
+    INVALID_MOVE = -1
+
 
 class Environment:
 
@@ -27,6 +33,7 @@ class Environment:
         if num_search_agents >= 1:
             for i in range(num_search_agents):
                 self.searchagents.append(start_coord)
+            self.num_agents = num_search_agents
 
     def add_target(self, random = True, set_location = Coord(0, 0)):
         if random == True:
@@ -80,9 +87,14 @@ class Environment:
             self.total_targets = 0
 
     def draw(self):
-        pass
+        for y in range(self.y):
+            for x in range(self.x):
+                pass
 
-    def generate(self):
+    def generate(self, x_max=10, y_max=10):
+        self.x = x_max
+        self.y = y_max
+
         for y in range(self.y):
             for x in range(self.x):
                 random_roll = randint(1, 100)
@@ -96,7 +108,14 @@ class Environment:
         self.grid.clear()
 
     def move_searchagent(self, agent_id, direction = Direction()):
-        pass
+        if agent_id >= 0 or agent_id < self.num_agents:
+            test_coord = self.searchagents[agent_id]
+            
+
+    def valid_coord(self, requested_coord):
+        if (requested_coord.x < self.x) and (requested_coord.y < self.y) and (requested_coord.x >= 0) and (requested_coord.y >= 0):
+            return True
+        return False
     def get_adjacent_tiles(self, agent_id):
         return_tiletypes    = list() # list of tiletypes of the tiles adjacent to the current agent
         current_coord       = self.searchagents[agent_id]
@@ -170,10 +189,3 @@ class Environment:
 
     def searchagent_position(self, agent_id):
         return self.searchagents[agent_id]
-
-    def valid_coord(self, requested_coord):
-        if (requested_coord.x < self.x) and (requested_coord.y < self.y) and (requested_coord.x >= 0) and (requested_coord.y >= 0):
-            return True
-        return False
-
-    
