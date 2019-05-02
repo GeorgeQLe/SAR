@@ -12,11 +12,12 @@ def add_endslash(directory_path = str()):
 
 def write_to_file(filename = str(), output = str(), directory = str()):
     if len(directory) == 0 and len(filename) > 0:
-       with open(filename, 'w', encoding='utf-8') as f:
+       with open(filename, 'a', encoding='utf-8') as f:
             f.write(output)
     elif len(directory) > 0 and len(filename) > 0:
         if valid_path(file_path = directory+filename):
-            pass
+            with open(directory+filename, 'a', encoding='utf-8') as f:
+                f.write(output)
 
 def valid_directory(directory_path = str(), filename = str()):
     if len(directory_path) == 0:

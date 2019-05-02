@@ -2,7 +2,7 @@
 
 from file import write_to_file
 from neuralnetwork import NeuralNetwork
-from tester import test_individual, test_group
+from tester import Tester
 
 from collections import OrderedDict
 from random import randint, uniform
@@ -30,6 +30,9 @@ class GeneticAlgorithm:
         self.__mutation_rate_single_point   = 50 # the rate in which single point crossover happens in the GA, default is 50%
         self.__mutation_rate_two_point      = 75 # the rate in which two point crossover happens in the GA, default is 75%
         self.__mutation_rate                = 5 # the rate in which a fixed point mutation occurs in the GA, default is 5%
+
+        # test
+        self.__tester                       = Tester()
 
     def __generate_new_population(self, layers_info):
         # creates the n number of neural networks that comprise the GA population
@@ -154,8 +157,8 @@ class GeneticAlgorithm:
         individual[random_roll] = round(uniform(-2, 2.3), 4)
 
     def __replacement(self, parent1, parent2):
-        score1      = test_individual(parent1)
-        score2      = test_individual(parent2)
+        score1      = self.__tester.test_individual(parent1)
+        score2      = self.__tester.test_individual(parent2)
 
         # designate parent 1 as the worst if parent1 is not worst than parent2
         # then swap the two parents
@@ -194,12 +197,18 @@ class GeneticAlgorithm:
     def __stable_replacement(self):
         self.__custom_quicksort(0, len(self.__scores) - 1)
 
-        # get the median score of the current population
         for population_index in range(0, round(len(self.__scores)/2)):
             individual = list()
             for individual_index in range(self.__number_of_individual_genes):
                 individual.append(round(uniform(-2.0, 2.0), 4))
             self.__population[population_index] = individual
+        # checks the rest of the population for any invalid move individuals and replace them 
+        for population_index in range(round(len(self.__scores)/2), len(self.__population)):
+            if self.__scores[population_index] == -10000:
+                individual = list()
+                for individual_index in range(self.__number_of_individual_genes):
+                    individual.append(round(uniform(-2.0, 2.0), 4))
+                self.__population[population_index] = individual
 
     def __custom_quicksort(self, low, high):
         if low < high:
@@ -229,7 +238,7 @@ class GeneticAlgorithm:
     def __test_population(self):
         # test the current population and return the resulting scores
         # test_group function found in tester.py
-        return test_group(self.__population)
+        return self.__tester.test_group(self.__population)
 
     def run(self, layers_info, num_generations, number_of_individuals, number_of_individual_genes):
         self.__number_of_generations        = num_generations
@@ -257,10 +266,6 @@ class GeneticAlgorithm:
             print("TEST POPULATION AT GENERATION", self.__current_generation_num)
             print()
             self.__scores = self.__test_population()
-            for i in range(len(self.__population)):
-                print("Genes of individual", i + 1, ":", self.__population[i])
-                print("Score for individual", i + 1, ":", self.__scores[i])
-            print()
 
             self.__selection()
             print("RESULT OF GENERATION", self.__current_generation_num)
@@ -271,6 +276,8 @@ class GeneticAlgorithm:
                 print("Genes of individual", i + 1, ":", self.__population[i])
                 print("Score for individual", i + 1, ":", self.__scores[i])
             print()
+            output = "\nBest score for generation " + str(self.__current_generation_num) + ": " + str(self.__scores[len(self.__scores) - 1]) + "\n"
+            write_to_file("GA.txt", output, "./Dumps/")
         # for generation_num in self.__old_populations.keys():
         #     print("Generation:", generation_num)
         #     for individual in self.__old_populations[generation_num]:

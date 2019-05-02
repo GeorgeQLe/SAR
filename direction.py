@@ -12,7 +12,7 @@ class Direction(enum.IntEnum):
     SW  = 7
     W   = 8
 
-def update_coords(coord = Coord(0, 0), direction = Direction()):
+def update_coords(direction, coord = Coord(0, 0)):
     if direction == Direction.NW:
         new_coord = Coord(coord.x -1, coord.y + 1)
     elif direction == Direction.N:
@@ -73,3 +73,21 @@ def resolve_decision_as_direction(decision):
         return Direction.SW
     elif decision < 1.0:
         return Direction.W
+
+def resolve_direction_as_new_coord(direction, coord = Coord(0, 0)):
+    if direction == Direction.NW:
+        return northwest(coord)
+    elif direction == Direction.N:
+        return north(coord)
+    elif direction == Direction.NE:
+        return northeast(coord)
+    elif direction == Direction.E:
+        return east(coord)
+    elif direction == Direction.SE:
+        return southeast(coord)
+    elif direction == Direction.S:
+        return south(coord)
+    elif direction == Direction.SW:
+        return southwest(coord)
+    elif direction == Direction.W:
+        return west(coord)

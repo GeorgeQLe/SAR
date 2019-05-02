@@ -1,6 +1,8 @@
 # Copyright 2019 George Le
 
-from searchagent import Environment, NeuralNetwork, SearchAgent, SearchAgentsType
+from environment import Environment
+from searchagent import SearchAgent
+from grader import grade
 
 from collections import OrderedDict
 
@@ -9,42 +11,38 @@ class Simulation:
     def __init__(self):
         self.__environment          = Environment()
         self.__frequency_falsepos   = 0
-        self.__searchagents         = list()
+        self.__searchagent          = SearchAgent()
 
-    def __setup_test_environment(self, x = 1, y = 1):
-        pass
+    def __setup_test_environment(self, x = 10, y = 10):
+        self.__environment.clear()
+        self.__environment.generate(x, y)
+        self.__environment.add_target()
 
-    def __setup_search_agents(self, num_search_agents = 1, searchagents = list()):
-        self.__searchagents.clear()
-        if num_search_agents == 1:
-            temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= 1)
-            temp.set_brain(searchagents)
-            self.__searchagents.append(temp)
-        else:
-            # for each of the search agents, plug in a neural network into it
-            for i in range(num_search_agents):
-                temp = SearchAgent(initial_position_x= 0, initial_position_y= 0, search_skill= 2, fuel_level= 100, max_fuel = 100, search_agent_type= SearchAgentsType.drone, ID= i + 1)
-                temp.set_brain(searchagents[i])
-                self.__searchagents.append(temp)
-        self.__environment.add_search_agent(num_search_agents= num_search_agents)
+    def __setup_search_agent(self, searchagent_genes = list()):
+       self.__searchagent.set_brain(searchagent_genes)
+       self.__environment.add_search_agent()
 
     def run_simulation(self, num_of_turns = 300):
         return_scores = list()
-        self.__environment.generate(self.__frequency_falsepos)
 
         for i in range(num_of_turns):
-            # print("Turn", i + 1)
-            for j in range(len(self.__searchagents)):
-                self.__environment.move_search_agent(searchagent_ID= self.__searchagents[j].get_ID(), new_position= self.__searchagents[j].turn(self.__environment))
+            # agent think and validation of the decision
+            move_result = self.__environment.move_searchagent(self.__searchagent.agent_id(), self.__searchagent.think(self.__environment.get_adjacent_tiles(self.__searchagent.agent_id())))
+            if move_result[1] == True:
+                # agent move if the move is valid
+                self.__searchagent.move(move_result[0])
+                if self.__environment.check_target(self.__searchagent.agent_id()):
+                    self.__searchagent.search_success()
+            else:
+                # if the move is invalid, returns a value far beyond the lowest possible value
+                self.__searchagent.reset()
+                return -10000
             # self.__environment.draw()
-        for i in range(len(self.__searchagents)):
-            return_scores.append(grade(agent= self.__searchagents[i]))
-
-        if len(self.__searchagents) == 1:
-            return_scores = return_scores[0]
-        self.__environment.empty()
+        return_scores = grade(self.__searchagent)
+        self.__environment.clear()
+        self.__searchagent.reset()
         return return_scores
 
-    def setup_simulation(self, x = 1, y = 1, num_search_targets = 1, num_search_agents = 1, searchagents = list()):
+    def setup_simulation(self, x = 10, y = 10, num_search_targets = 1, num_search_agents = 1, searchagent_genes = list()):
         self.__setup_test_environment(x, y)
-        self.__setup_search_agents(num_search_agents, searchagents)
+        self.__setup_search_agent(searchagent_genes)

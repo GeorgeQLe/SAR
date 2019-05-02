@@ -6,20 +6,15 @@ from random import randint
 import enum
 
 from coord import Coord
-from direction import Direction, northwest, north, northeast, east, southeast, south, southwest, west
+from direction import Direction, resolve_direction_as_new_coord
 from tiletype import TileType
-
-class MoveResult(enum.IntEnum):
-    INVALID_MOVE = -1
-
 
 class Environment:
 
     def __init__(self, x_max = 10, y_max = 10):
         self.x              = x_max  # specifies the max x coordinate
         self.y              = y_max  # specifies the max y coordinate
-
-        self.grid           = dict() # a dict which holds a key-value pair of Coord to Tiletype
+        self.grid           = OrderedDict() # a dict which holds a key-value pair of Coord to Tiletype
 
         self.num_agents     = 0      # holds the number of search agents that are currently in the environment grid
         self.searchagents   = list() # list of coordinates for the search agents currently in the environment grid
@@ -28,6 +23,9 @@ class Environment:
         self.target_coords  = list() # list of coordinates for the targets currently in the environment grid
         self.target_set     = False  # boolean value which tracks whether or not a target has been created in the grid
         self.total_targets  = 0      # hold the total number of targets that are in the environment grid
+
+    def at(self, x, y):
+        return self.grid[(x, y)]
 
     def add_search_agent(self, start_coord = Coord(0, 0), num_search_agents = 1):
         if num_search_agents >= 1:
@@ -61,7 +59,8 @@ class Environment:
             self.total_targets+=num_targets
         self.target_set = True
 
-    def check_target(self, potential_coord):
+    def check_target(self, agent_id):
+        potential_coord = self.searchagents[agent_id]
         if potential_coord in self.target_coords:
             self.found_target(potential_coord)
             return True
@@ -98,19 +97,24 @@ class Environment:
         for y in range(self.y):
             for x in range(self.x):
                 random_roll = randint(1, 100)
+                coord = Coord(x, y)
                 if random_roll < 90:
-                    self.grid[Coord(x, y)] = TileType.empty
+                    self.grid[(coord.x, coord.y)] = TileType.empty
                 else:
-                    self.grid[Coord(x, y)] = TileType.obstacle
+                    self.grid[(coord.x, coord.y)] = TileType.obstacle
         for target_coord in self.target_coords:
-            self.grid[target_coord] = TileType.target
+            self.grid[(target_coord.x, target_coord.y)] = TileType.target
+
     def clear(self):
         self.grid.clear()
+        self.searchagents.clear()
+        self.remove_all_targets()
 
-    def move_searchagent(self, agent_id, direction = Direction()):
-        if agent_id >= 0 or agent_id < self.num_agents:
-            test_coord = self.searchagents[agent_id]
-            
+    def move_searchagent(self, agent_id, direction):
+        if self.valid_coord(resolve_direction_as_new_coord(direction, self.searchagents[agent_id])):
+            self.searchagents[agent_id] = resolve_direction_as_new_coord(direction, self.searchagents[agent_id])
+            return ((self.searchagents[agent_id].x, self.searchagents[agent_id].y), True)
+        return ((self.searchagents[agent_id].x, self.searchagents[agent_id].y), False)
 
     def valid_coord(self, requested_coord):
         if (requested_coord.x < self.x) and (requested_coord.y < self.y) and (requested_coord.x >= 0) and (requested_coord.y >= 0):
@@ -118,69 +122,66 @@ class Environment:
         return False
     def get_adjacent_tiles(self, agent_id):
         return_tiletypes    = list() # list of tiletypes of the tiles adjacent to the current agent
-        current_coord       = self.searchagents[agent_id]
 
-        # get the northwest tiletype
-        nw                  = northwest(current_coord)
-        if nw in self.grid.keys():
-            # appends to the list of tiletypes to be returned 
-            return_tiletypes.append(self.grid[nw])
+        nw = resolve_direction_as_new_coord(Direction.NW, self.searchagents[agent_id])
+        if self.valid_coord(nw):
+            return_tiletypes.append(int(self.grid[(nw.x, nw.y)]))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the north tiletype
-        n                   = north(current_coord)
-        if n in self.grid.keys():
-            return_tiletypes.append(self.grid[n])
+        n = resolve_direction_as_new_coord(Direction.N, self.searchagents[agent_id])
+        if self.valid_coord(n):
+            return_tiletypes.append(self.at(n.x, n.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the northeast tiletype
-        ne                  = northeast(current_coord)
-        if ne in self.grid.keys():
-            return_tiletypes.append(self.grid[ne])
+        ne = resolve_direction_as_new_coord(Direction.NE, self.searchagents[agent_id])
+        if self.valid_coord(ne):
+            return_tiletypes.append(self.at(ne.x, ne.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the east tiletype
-        e                   = east(current_coord)
-        if e in self.grid.keys():
-            return_tiletypes.append(self.grid[e])
+        e = resolve_direction_as_new_coord(Direction.E, self.searchagents[agent_id])
+        if self.valid_coord(e):
+            return_tiletypes.append(self.at(e.x, e.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the southeast tiletype
-        se                  = southeast(current_coord)
-        if se in self.grid.keys():
-            return_tiletypes.append(self.grid[se])
+        se = resolve_direction_as_new_coord(Direction.SE, self.searchagents[agent_id])
+        if self.valid_coord(se):
+            return_tiletypes.append(self.at(se.x, se.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the south tiletype
-        s                   = south(current_coord)
-        if s in self.grid.keys():
-            return_tiletypes.append(self.grid[s])
+        s = resolve_direction_as_new_coord(Direction.S, self.searchagents[agent_id])
+        if self.valid_coord(s):
+            return_tiletypes.append(self.at(s.x, s.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the southwest tiletype
-        sw                  = southwest(current_coord)
-        if sw in self.grid.keys():
-            return_tiletypes.append(self.grid[sw])
+        sw = resolve_direction_as_new_coord(Direction.SW, self.searchagents[agent_id])
+        if self.valid_coord(sw):
+            return_tiletypes.append(self.at(sw.x, sw.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)
 
         # get the west tiletype
-        w                   = west(current_coord)
-        if w in self.grid.keys():
-            return_tiletypes.append(self.grid[w])
+        w = resolve_direction_as_new_coord(Direction.W, self.searchagents[agent_id])
+        if self.valid_coord(w):
+            return_tiletypes.append(self.at(w.x, w.y))
         else:
             # choosen coordinate is outside the grid so therefore is a wall
             return_tiletypes.append(TileType.wall)

@@ -17,14 +17,14 @@ def main():
         path = argv[2]
         if not valid_directory(path):
             print("ERROR:", path, "is not a valid path!")
-            
+
     ga = GeneticAlgorithm()
     ga.run(layers_info= dict({
             0 : (9, 5),
             1 : (5, 1)
             }), 
-            num_generations= 100, 
-            number_of_individuals= 10, 
+            num_generations= 200, 
+            number_of_individuals= 50, 
             number_of_individual_genes= 50)
 
 if __name__ == "__main__":
